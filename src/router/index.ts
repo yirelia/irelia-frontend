@@ -23,6 +23,10 @@ const router = createRouter({
         {
             path: '/three',
             component: () => import('@/views/three/index.vue')
+        },
+        {
+            path: '/file',
+            component: () => import('@/views/upload-big-file/index.vue')
         }
     ]
 })
