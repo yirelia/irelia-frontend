@@ -11,6 +11,8 @@
   "dependencies": {
     "@antv/x6": "^2.15.4",
     "@types/node": "^20.6.0",
+    "axios": "^1.6.0",
+    "bignumber.js": "^9.0.1",
     "element-plus": "^2.3.12",
     "three": "^0.156.1",
     "vue": "^3.3.4",

@@ -10,25 +10,33 @@
 import { createRouter, createWebHistory } from "vue-router";
 
 const router = createRouter({
-  history: createWebHistory(),
-  routes: [
-    {
-      path: "/",
-      redirect: "",
-    },
-    {
-      path: "/svg-animation",
-      component: () => import("@/views/svg/test-svg.vue"),
-    },
-    {
-      path: "/three",
-      component: () => import("@/views/three/index.vue"),
-    },
-    {
-      path: "/dom",
-      component: () => import("@/views/domparse/index.vue"),
-    },
-  ],
-});
+    history: createWebHistory(),
+    routes:[
+        {
+            path: '/',
+            redirect: ''
+        },
+        {
+            path: '/svg-animation',
+            component: () => import('@/views/svg/test-svg.vue')
+        },
+        {
+            path: '/three',
+            component: () => import('@/views/three/index.vue')
+        },
+        {
+            path: '/file',
+            component: () => import('@/views/upload-big-file/index.vue')
+        },
+        {
+          path: "/dom",
+          component: () => import("@/views/domparse/index.vue"),
+        },
+        {
+            path: '/render',
+            component: () => import('@/views/geo/index.vue')
+        }
+    ]
+})
 
 export default router;
