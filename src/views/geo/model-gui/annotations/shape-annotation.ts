@@ -47,7 +47,7 @@ export default abstract class ShapeAnnotation {
 
   public component: Component | null;
 
-  public extentPoints: Point[];
+  public extentPoints: Point[] = [];
 
   constructor(graph: Graph, shape: DiagramShape, component: Component | null) {
     this.shape = shape;
@@ -241,6 +241,17 @@ export default abstract class ShapeAnnotation {
     const scalePoints = this.scalePoints(this.extentPoints, sx, sy);
     let translatePoints = this.translatePoints(scalePoints, cx, cy);
     translatePoints = this.translatePoints(translatePoints, tx, ty);
+    console.log(`comptent cx: ${cx} cy: ${cy} tx: ${stx} ty ${sty}`)
+    this.originalPoint = {
+      x: stx * sx + cx + tx,
+      y: sty * sy + cy + ty
+    }
+    if(this.extentPoints[0].x < this.extentPoints[0].x) {
+      console.log('fanzhuan')
+    }
+    console.log(`originPoint x: ${this.originalPoint.x}  y: ${this.originalPoint.y}`)
+
+
     translatePoints = this.translatePoints(translatePoints, stx * sx, sty * sy);
     return translatePoints;
   }

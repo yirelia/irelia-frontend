@@ -79,7 +79,8 @@ export class Component {
     this.componentInfo = component;
     this.graph = graph;
     this.componentType = type;
-    const viewScale = type === ViewType.Diagram ? Component.viewScale : 1;
+    // const viewScale = type === ViewType.Diagram ? Component.viewScale : 1;
+    const viewScale = 1;
     const extent1Diagram = (this.extent1Diagram = toPoint(
       component.extent1Diagram,
       viewScale,
@@ -90,9 +91,9 @@ export class Component {
       viewScale,
       viewScale
     ));
-    this.originDiagram = toPoint(component.originDiagram, viewScale, viewScale);
-    this.width = Math.abs(extent1Diagram.x - extent2Diagram.x);
-    this.height = Math.abs(extent1Diagram.y - extent2Diagram.y);
+    // this.originDiagram = toPoint(component.originDiagram, viewScale, viewScale);
+    // this.width = Math.abs(extent1Diagram.x - extent2Diagram.x);
+    // this.height = Math.abs(extent1Diagram.y - extent2Diagram.y);
     const extent1 = component.coordinate_system.extent1_diagram.map(item =>
       toNum(item)
     );
@@ -192,6 +193,7 @@ export class Component {
   }
 
   public getMarkUp() {
+    console.log(`componet poition otx: ${this.originDiagram.x} oty: ${this.originDiagram.y}`)
     const shapeList = [];
     for (const shape of this.componentInfo.subShapes) {
       if (shape.type === 'Rectangle') {

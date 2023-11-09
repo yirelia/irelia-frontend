@@ -43,12 +43,18 @@ export class Transformation {
     const { x: tx, y: ty } = this.component.originDiagram;
     const sx = this.component.coOrdinateSystem.flipX;
     const sy = this.component.coOrdinateSystem.flipY;
+    const psx = this.component.coOrdinateSystem.getViewScaleX();
+    const psy = this.component.coOrdinateSystem.getViewScaleY();
+    const { x: stx, y: sty } = this.shape.originalPoint;
+
+
     const diagramTx = tx + cx;
     const diagramTy = ty + cy;
     const backTx = sx * diagramTx;
     const backTy = sy * diagramTy;
     transform.rotate(rotation, diagramTx, diagramTy);
-    transform.rotate(this.shape.rotation, diagramTx, diagramTy);
+    // transform.rotate(this.shape.rotation, diagramTx, diagramTy);
+    transform.rotate(this.shape.rotation, stx, sty);
     transform.translate(-backTx, -backTy);
     transform.scale(sx, sy);
     transform.translate(backTx, backTy);

@@ -27,6 +27,10 @@ const router = createRouter({
         {
             path: '/file',
             component: () => import('@/views/upload-big-file/index.vue')
+        },
+        {
+            path: '/render',
+            component: () => import('@/views/geo/index.vue')
         }
     ]
 })
