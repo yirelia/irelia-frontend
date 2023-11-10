@@ -1,8 +1,8 @@
 /*
  * @Author: yangrui 17368465776@163.com
  * @Date: 2023-07-02 14:35:04
- * @LastEditors: yangrui 17368465776@163.com
- * @LastEditTime: 2023-07-02 21:09:23
+ * @LastEditors: simtek/yangrui 17368465776@163.com
+ * @LastEditTime: 2023-11-10 18:13:23
  * @FilePath: /yssim-frontend-vue3/src/views/svg/model-gui/enums/index.ts
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -21,6 +21,7 @@ export enum GraphDataTagEnum {
 export enum ViewType {
   Diagram = "Diagram",
   Icon = "Icon",
+  View = "ViewDiagram",
 }
 
 // 图形类型
@@ -30,6 +31,7 @@ export enum ShapeType {
   Polygon = "Polygon",
   Ellipse = "Ellipse",
   Text = "Text",
+  Bitmap = "Bitmap",
 }
 
 export enum ModelicaClasses {

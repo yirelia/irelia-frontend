@@ -1,68 +1,71 @@
 import type { Graph } from "@antv/x6";
-import type { Transformation } from "../component/transformation";
+import type { Transformation } from "../components/transformation";
 import type { DiagramShape, Point } from "../model";
-import { convertMMToPixel, toNum, toPoint } from "../utils";
-import type { Component } from "../component/component";
-import { FillPattern, ViewType } from "../enums";
+import { convertMMToPixel, toNum, toPoint, toRgbColor } from "../utils";
+import type { Component } from "../components/component";
+import { FillPattern, ViewScale, ViewType } from "../enums";
 import BigNumber from "bignumber.js";
 
 export default abstract class ShapeAnnotation {
-  public lineColor = "rgb(0, 0, 0)";
-  public linePattern = "LineSolid";
-  public lineThickness = 0.25;
-  public smooth = "smooth";
-  public extents = [
-    { x: 0, y: 0 },
-    { x: 0, y: 0 },
-  ];
-  public borderPattern = "None";
+  // 方法需要使用
+  public rawShape!: DiagramShape;
+  public stroke = `rgb(0, 0, 0)`;
+  public color = `rgb(0, 0, 0)`;
+  public strokeWidth = 0.25;
+  public strokeDasharray = "";
+  // 是否为平滑曲线
+  public isSmooth = false;
   public radius = 0;
+  public rotation = 0;
+  public fill = `rgb(0, 0, 0)`;
+  public extents = [];
   public startAngle = 0;
   public endAngle = 360;
   public originalTextString = "";
   public textString = "";
-  public fontSize = 0;
+  public fontSize = 12;
   public fontName = "";
-
-  public fill = "none";
-  // 绘制颜色
-  public stroke = "none";
-  // 旋转角度
-  public rotation = 0;
-
   public tag = "";
-
-  // 方法需要使用
-  public shape: DiagramShape;
-  public graph: Graph;
-
+  public graph!: Graph;
   public transformation: Transformation;
-
   public originalPoint = {
     x: 0,
     y: 0,
   };
-
+  public component: Component | undefined;
+  public extentPoints: Point[] = [];
+  public opacity = 1;
   public magnet = false;
 
-  public component: Component | null;
+  // 是否为注释图形
+  public isDiagram = false;
 
-  public extentPoints: Point[] = [];
-
-  constructor(graph: Graph, shape: DiagramShape, component: Component | null) {
-    this.shape = shape;
+  // 默认的缩放比例
+  public viewScale = ViewScale;
+  constructor(graph: Graph, shape: DiagramShape, component?: Component) {
     this.graph = graph;
-    this.component = component;
+    this.rawShape = shape;
+    if (this.component) {
+      this.component = component;
+    }
     this.rotation = -toNum(shape.rotation);
     this.originalPoint = toPoint(shape.originalPoint);
-    this.lineColor = this.getLineColor();
-    this.lineThickness = this.getLineThickness();
-    this.fill = this.getFillColor();
-    this.initShapePoints(shape);
+    this.stroke = this.getStroke();
+    this.color = toRgbColor(this.rawShape.color);
+    this.strokeWidth = this.getStrokeWidth();
+    this.opacity = this.rawShape.opacity || 0;
+    this.magnet = this.rawShape.magnet;
+    this.isSmooth = this.rawShape.smooth === "smooth";
+
+    this.originalTextString =
+      this.rawShape.originalTextString === "%name"
+        ? this.component?.componentInfo.name || ""
+        : this.rawShape.originalTextString;
+    this.isDiagram = this.rawShape.diagram || false;
   }
 
   public initShapePoints(shape: DiagramShape) {
-    let points = [];
+    let points: string[] = [];
     if (shape.type === "Rectangle") {
       points = shape.extentsPoints;
     } else if (shape.type === "Line") {
@@ -80,27 +83,18 @@ export default abstract class ShapeAnnotation {
   }
 
   /**
-   * @description: 获取rgb颜色
-   * @param {string} color
-   * @return {*}
-   */
-  public getRgbColor(color: string) {
-    return `rgb(${color})`;
-  }
-
-  /**
    * @description: 获取线的颜色
    * @return {*}
    */
-  public getLineColor() {
-    const { linePattern, color } = this.shape;
+  private getStroke(): string {
+    const { linePattern, color } = this.rawShape;
     if (linePattern === "LinePattern.None") {
       return "none";
     }
-    return this.getRgbColor(color);
+    return toRgbColor(color);
   }
 
-  public getLineThickness() {
+  private getStrokeWidth(): number {
     /* Ticket #4490
      * The specification doesn't say anything about it.
      * But just to keep this consist with Dymola set a default line thickness for border patterns raised & sunken.
@@ -109,7 +103,7 @@ export default abstract class ShapeAnnotation {
     // if (mBorderPattern == StringHandler::BorderRaised || mBorderPattern == StringHandler::BorderSunken) {
     //   thickness = Utilities::convertMMToPixel(0.25);
     // }
-    const lineThickness = toNum(this.shape.lineThickness) || 0.25;
+    const lineThickness = toNum(this.rawShape.lineThickness) || 0.25;
     return convertMMToPixel(lineThickness);
   }
 
@@ -118,9 +112,9 @@ export default abstract class ShapeAnnotation {
    * @return {*}
    */
   public getFillColor() {
-    const { fillPattern, color, fillColor } = this.shape;
-    const fill = this.getRgbColor(fillColor);
-    const gradientColor = this.getRgbColor(color);
+    const { fillPattern, color, fillColor } = this.rawShape;
+    const fill = toRgbColor(fillColor);
+    const gradientColor = toRgbColor(color);
     const graph = this.graph;
     let gradientId = "";
     switch (fillPattern) {
@@ -200,10 +194,18 @@ export default abstract class ShapeAnnotation {
   }
 
   public getPathPoint(): Point[] {
-    if (this.component.componentType === ViewType.Diagram) {
-      return this.getDiagramPoints();
+    if (this.isDiagram) {
+      return this.getDiagramViewPoints();
+    } else {
+      if (this.component?.componentType === ViewType.Diagram) {
+        return this.getDiagramPoints();
+      }
+      return this.getIconPoints();
     }
-    return this.getIconPoints();
+  }
+
+  public getDiagramViewPoints() {
+    return this.scalePoints(this.extentPoints, ViewScale, ViewScale);
   }
 
   public setMagnet(magnet: boolean) {
@@ -331,25 +333,5 @@ export default abstract class ShapeAnnotation {
       x,
       y,
     };
-  }
-}
-
-export class DiagramAnnotation extends ShapeAnnotation {
-  static viewScale = 5;
-
-  constructor(graph: Graph, diagramShape: DiagramShape) {
-    super(graph, diagramShape, null);
-  }
-
-  /**
-   * @description: 获取路径坐标点
-   * @return {*}
-   */
-  public getPathPoint(): Point[] {
-    return this.scalePoints(
-      this.extentPoints,
-      DiagramAnnotation.viewScale,
-      DiagramAnnotation.viewScale
-    );
   }
 }

@@ -30,3 +30,11 @@ export interface DiagramComponent {
   visibleList: any[]; // 变量数组
   coordinate_system: CoOrdinateSystem;
 }
+
+export type CoOrdinateSystem = {
+  // 系统坐标
+  extent1_diagram: [number, number];
+  extent2_diagram: [number, number];
+  initial_scale: number;
+  preserve_aspect_ratio: boolean;
+};

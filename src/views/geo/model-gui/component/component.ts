@@ -1,15 +1,15 @@
-import type { Graph } from '@antv/x6';
-import type { DiagramComponent } from '../model';
-import { Point } from '../model';
+import type { Graph } from "@antv/x6";
+import type { DiagramComponent } from "../model";
+import { Point } from "../model";
 import {
   Flip,
   GraphDataTagEnum,
   ModelicaClasses,
   ShapeLayer,
   ViewScale,
-  ViewType
-} from '../enums';
-import { toNum, toPoint } from '../utils';
+  ViewType,
+} from "../enums";
+import { toNum, toPoint } from "../utils";
 import {
   BitmapAnnotation,
   EllipseAnnotation,
@@ -17,9 +17,9 @@ import {
   PolygonAnnotation,
   RectangleAnnotation,
   TextAnnotation,
-  makeDefaultRectangle
-} from '../annotations';
-import CoOrdinateSystem from './co-ordinate-system';
+  makeDefaultRectangle,
+} from "../annotations";
+import CoOrdinateSystem from "./co-ordinate-system";
 
 export class Component {
   public componentInfo: DiagramComponent;
@@ -38,25 +38,25 @@ export class Component {
   // 绘图视图中的实际左下角的坐标
   public extent1Diagram = {
     x: -100,
-    y: 100
+    y: 100,
   };
 
   // 绘图视图中的实际右上角的坐标
   public extent2Diagram = {
     x: 100,
-    y: -100
+    y: -100,
   };
 
   // 绘图视图中的偏移量坐标
   public originDiagram = {
     x: 0,
-    y: 0
+    y: 0,
   };
 
   // 盒子图形的中心点
   public center = {
     x: 0,
-    y: 0
+    y: 0,
   };
 
   // 旋转角度
@@ -94,10 +94,10 @@ export class Component {
     // this.originDiagram = toPoint(component.originDiagram, viewScale, viewScale);
     // this.width = Math.abs(extent1Diagram.x - extent2Diagram.x);
     // this.height = Math.abs(extent1Diagram.y - extent2Diagram.y);
-    const extent1 = component.coordinate_system.extent1_diagram.map(item =>
+    const extent1 = component.coordinate_system.extent1_diagram.map((item) =>
       toNum(item)
     );
-    const extent2 = component.coordinate_system.extent2_diagram.map(item =>
+    const extent2 = component.coordinate_system.extent2_diagram.map((item) =>
       toNum(item)
     );
     // get the horizontal flip
@@ -107,7 +107,7 @@ export class Component {
     const flipY = extent2Diagram.y > extent1Diagram.y ? -1 : 1;
     const coOrdinateSystemPoints = [
       new Point(extent1[0], extent1[1]),
-      new Point(extent2[0], extent2[1])
+      new Point(extent2[0], extent2[1]),
     ];
     this.coOrdinateSystem.setInitialScale(
       component.coordinate_system.initial_scale
@@ -116,6 +116,7 @@ export class Component {
     this.coOrdinateSystem.setPreserveAspectRatio(
       component.coordinate_system.preserve_aspect_ratio
     );
+
     this.coOrdinateSystem.setFlipX(flipX);
     this.coOrdinateSystem.setFlipY(flipY);
     const viewSx = this.width / this.coOrdinateSystem.getWidth();
@@ -129,20 +130,20 @@ export class Component {
     this.y =
       Math.min(extent1Diagram.y, extent2Diagram.y) + this.originDiagram.y;
     this.rotation = -toNum(component.rotation);
-    this.componentInfo.subShapes = this.componentInfo.subShapes.map(shape => {
+    this.componentInfo.subShapes = this.componentInfo.subShapes.map((shape) => {
       shape.opacity = 1;
       return shape;
     });
-    // ticket 先添加一个边界矩形占位
-    this.addBoundingRect();
-    const magnet = this.isConnector();
-    if (magnet) {
-      if (this.componentType === ViewType.Icon) {
-        this.addBoundingRect(true);
-      } else {
-        this.addComponetConectorRect();
-      }
-    }
+    // // ticket 先添加一个边界矩形占位
+    // this.addBoundingRect();
+    // const magnet = this.isConnector();
+    // if (magnet) {
+    //   if (this.componentType === ViewType.Icon) {
+    //     this.addBoundingRect(true);
+    //   } else {
+    //     this.addComponetConectorRect();
+    //   }
+    // }
   }
 
   /**
@@ -157,12 +158,12 @@ export class Component {
       this.componentInfo.coordinate_system.extent2_diagram;
     const extentsPoints = [
       `${defaultExtent1Diagram[0]},${defaultExtent1Diagram[1]}`,
-      `${defaultExtent2Diagram[0]},${defaultExtent2Diagram[1]}`
+      `${defaultExtent2Diagram[0]},${defaultExtent2Diagram[1]}`,
     ];
     const reactangle = makeDefaultRectangle({
       extentsPoints,
       magnet,
-      opacity: 0
+      opacity: 0,
     }) as any;
     if (isIcon) {
       this.componentInfo.subShapes.push(reactangle);
@@ -182,35 +183,37 @@ export class Component {
     const height = this.height * sy;
     const extentsPoints = [
       `${cx - width / 2},${cy - height / 2}`,
-      `${cx + width / 2},${cy + height / 2}`
+      `${cx + width / 2},${cy + height / 2}`,
     ];
     const reactangle = makeDefaultRectangle({
       extentsPoints,
       magnet,
-      opacity: 0
+      opacity: 0,
     }) as any;
     this.componentInfo.subShapes.push(reactangle);
   }
 
   public getMarkUp() {
-    console.log(`componet poition otx: ${this.originDiagram.x} oty: ${this.originDiagram.y}`)
+    console.log(
+      `componet poition otx: ${this.originDiagram.x} oty: ${this.originDiagram.y}`
+    );
     const shapeList = [];
     for (const shape of this.componentInfo.subShapes) {
-      if (shape.type === 'Rectangle') {
+      if (shape.type === "Rectangle") {
         shapeList.push(new RectangleAnnotation(this.graph, shape, this));
-      } else if (shape.type === 'Line') {
+      } else if (shape.type === "Line") {
         shapeList.push(new LineAnnotation(this.graph, shape, this));
-      } else if (shape.type === 'Polygon') {
+      } else if (shape.type === "Polygon") {
         shapeList.push(new PolygonAnnotation(this.graph, shape, this));
-      } else if (shape.type === 'Ellipse') {
+      } else if (shape.type === "Ellipse") {
         shapeList.push(new EllipseAnnotation(this.graph, shape, this));
-      } else if (shape.type === 'Text') {
+      } else if (shape.type === "Text") {
         shapeList.push(new TextAnnotation(this.graph, shape, this));
-      } else if (shape.type === 'Bitmap') {
+      } else if (shape.type === "Bitmap") {
         shapeList.push(new BitmapAnnotation(this.graph, shape, this));
       }
     }
-    return shapeList.map(item => item.markup());
+    return shapeList.map((item) => item.markup());
   }
 
   /**
@@ -221,7 +224,7 @@ export class Component {
     const markup = this.getMarkUp();
     // 过滤掉用户自定义的占位符
     this.componentInfo.subShapes = this.componentInfo.subShapes.filter(
-      shape => !shape.isCustom
+      (shape) => !shape.isCustom
     );
     const width =
       this.componentType === ViewType.Diagram ? this.width : this.parent.width;
@@ -229,7 +232,7 @@ export class Component {
       this.componentType === ViewType.Diagram
         ? this.height
         : this.parent.height;
-    const parent = this.parent ? this.parent.componentInfo.name : '';
+    const parent = this.parent ? this.parent.componentInfo.name : "";
     const id = this.getComponentId();
     const data = this.getData();
     return this.graph.createNode({
@@ -239,7 +242,7 @@ export class Component {
       markup,
       parent,
       data,
-      zIndex: this.zIndex
+      zIndex: this.zIndex,
     });
   }
 
@@ -273,7 +276,7 @@ export class Component {
     return {
       tag,
       data: this.componentInfo,
-      parent: this.parent?.componentInfo
+      parent: this.parent?.componentInfo,
     };
   }
 }

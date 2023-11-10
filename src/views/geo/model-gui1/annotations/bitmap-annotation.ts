@@ -1,10 +1,10 @@
-import type { Graph } from "@antv/x6";
-import BigNumber from "bignumber.js";
-import { Component } from "../component/component";
-import { Transformation } from "../component/transformation";
-import { DiagramShape, Point } from "../model";
-import { toPoint } from "../utils";
-import ShapeAnnotation from "./shape-annotation";
+import type { Graph } from '@antv/x6';
+import BigNumber from 'bignumber.js';
+import { Component } from '../component/component';
+import { Transformation } from '../component/transformation';
+import { DiagramShape, Point } from '../model';
+import { toPoint } from '../utils';
+import ShapeAnnotation from './shape-annotation';
 
 export default class BitmapAnnotation extends ShapeAnnotation {
   constructor(graph: Graph, shape: DiagramShape, parent: Component) {
@@ -45,9 +45,9 @@ export default class BitmapAnnotation extends ShapeAnnotation {
     const { x, y, width, height } = this.getBox(p1, p2);
     const transform = this.transformation.getTransformationMatrix();
     return {
-      tagName: "image",
+      tagName: 'image',
       attrs: {
-        "xlink:href": `data:image/png;base64,${imageBase64}`,
+        'xlink:href': `data:image/png;base64,${imageBase64}`,
         width,
         height,
         x,
