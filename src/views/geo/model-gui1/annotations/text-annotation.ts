@@ -8,24 +8,17 @@ import type { DiagramShape } from "../model";
 export default class TextAnnotation extends ShapeAnnotation {
   public tag = ShapeType.Text;
 
-  public parent: Component;
-  constructor(graph: Graph, shape: DiagramShape, parent: Component) {
+  constructor(graph: Graph, shape: DiagramShape, parent?: Component) {
     super(graph, shape, parent);
-    this.parent = parent;
-    this.transformation = new Transformation(this, parent);
   }
 
   public markup() {
-    const { color, originalTextString } = this.shape;
+    const { color, originalTextString } = this;
     const [p1, p2] = this.getPathPoint();
     const { x, y, width, height } = this.getBox(p1, p2);
-    const fontColor = this.getRgbColor(color);
+    const fontColor = color
     const transform = this.transformation.getTransformationMatrix();
     const divHight = `${height}px`;
-    const text =
-      originalTextString === "%name"
-        ? this.parent.componentInfo.name
-        : originalTextString;
     const htmlTransform = this.getTextTransformScale(transform);
     return {
       tagName: "foreignObject",
@@ -52,7 +45,7 @@ export default class TextAnnotation extends ShapeAnnotation {
             fontSize: `12px`,
             transform: htmlTransform,
           },
-          textContent: text,
+          textContent: originalTextString,
         },
       ],
     };
@@ -80,12 +73,13 @@ export default class TextAnnotation extends ShapeAnnotation {
       // 参数配置 分别对应里面的 flipX flipY
       textDefaultTransform.scale(Number(scaleParam[1]), Number(scaleParam[2]));
     }
-    const pFlipX = this.parent.coOrdinateSystem.flipX;
-    const pFlipY = this.parent.coOrdinateSystem.flipY;
-    const componentAngle = getNormalizedAngle(this.parent.rotation);
+    const pFlipX = this.component?.coordinateSystem.flipX;
+    const pFlipY = this.component?.coordinateSystem.flipY;
+    const componentRotation = this.component?.componentInfo.rotation || 0
+    const componentAngle = getNormalizedAngle(componentRotation);
     let shapeAngle = getNormalizedAngle(this.rotation);
     if (shapeAngle > 0) {
-      shapeAngle = getNormalizedAngle(this.parent.rotation + this.rotation);
+      shapeAngle = getNormalizedAngle(componentRotation + this.rotation);
       if (shapeAngle === 180) {
         textDefaultTransform.scale(-1, 1);
       }

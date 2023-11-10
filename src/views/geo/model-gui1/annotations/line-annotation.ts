@@ -1,17 +1,15 @@
 import { Graph } from '@antv/x6';
-import { Transformation } from '../component/transformation';
 import { ShapeType } from '../enums';
 import { DiagramShape, PointArray } from '../model';
-import { toPoint } from '../utils';
 import ShapeAnnotation from './shape-annotation';
-import { Component } from '../component/component';
+import { Component } from '../components/component';
 
 export default class LineAnnotation extends ShapeAnnotation {
   tag = ShapeType.Line;
-
-  constructor(graph: Graph, shape: DiagramShape, parent: Component) {
+  private isBezier = false
+  constructor(graph: Graph, shape: DiagramShape, parent?: Component) {
     super(graph, shape, parent);
-    this.transformation = new Transformation(this, parent);
+    this.isBezier =  this.rawShape.smooth == 'Smooth.Bezier';
   }
 
   /**
@@ -63,15 +61,12 @@ export default class LineAnnotation extends ShapeAnnotation {
   }
 
   public markup() {
-    const { linePattern, smooth } = this.shape;
+    const { strokeDasharray, stroke, strokeWidth } = this;
     const linePoints = this.getPathPoint();
-    const strokeWidth = this.lineThickness;
-    const strokeDasharray = linePattern !== 'LinePattern.Solid' ? 1 : 0;
-    const stroke = this.lineColor;
     const fill = 'none';
-    const isBezier = smooth == 'Smooth.Bezier';
+    
     const transform = this.transformation.getTransformationMatrix();
-    const path = this.getLine(linePoints, isBezier);
+    const path = this.getLine(linePoints, this.isBezier);
     return {
       tagName: 'path',
       attrs: {

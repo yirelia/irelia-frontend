@@ -1,5 +1,5 @@
 import type { Graph } from "@antv/x6";
-import type { Transformation } from "../components/transformation";
+import { Transformation } from "../components/transformation";
 import type { DiagramShape, Point } from "../model";
 import { convertMMToPixel, toNum, toPoint, toRgbColor } from "../utils";
 import type { Component } from "../components/component";
@@ -12,7 +12,7 @@ export default abstract class ShapeAnnotation {
   public stroke = `rgb(0, 0, 0)`;
   public color = `rgb(0, 0, 0)`;
   public strokeWidth = 0.25;
-  public strokeDasharray = "";
+  public strokeDasharray = 0;
   // 是否为平滑曲线
   public isSmooth = false;
   public radius = 0;
@@ -27,7 +27,7 @@ export default abstract class ShapeAnnotation {
   public fontName = "";
   public tag = "";
   public graph!: Graph;
-  public transformation: Transformation;
+  public transformation!: Transformation;
   public originalPoint = {
     x: 0,
     y: 0,
@@ -39,6 +39,8 @@ export default abstract class ShapeAnnotation {
 
   // 是否为注释图形
   public isDiagram = false;
+  // 
+  public xlinkHref = ''
 
   // 默认的缩放比例
   public viewScale = ViewScale;
@@ -48,6 +50,7 @@ export default abstract class ShapeAnnotation {
     if (this.component) {
       this.component = component;
     }
+    this.initShapePoints(this.rawShape)
     this.rotation = -toNum(shape.rotation);
     this.originalPoint = toPoint(shape.originalPoint);
     this.stroke = this.getStroke();
@@ -62,6 +65,11 @@ export default abstract class ShapeAnnotation {
         ? this.component?.componentInfo.name || ""
         : this.rawShape.originalTextString;
     this.isDiagram = this.rawShape.diagram || false;
+    this.strokeDasharray = this.rawShape.linePattern !== 'LinePattern.Solid' ? 5 : 0;
+    if(this.rawShape.imageBase64) {
+      this.xlinkHref = `data:image/png;base64,${this.rawShape.imageBase64}`
+    }
+    this.transformation = new Transformation(this, this.component)
   }
 
   public initShapePoints(shape: DiagramShape) {
@@ -235,31 +243,32 @@ export default abstract class ShapeAnnotation {
    * @return {*}
    */
   public getDiagramPoints(): Point[] {
-    const sx = this.component.coOrdinateSystem.getViewScaleX();
-    const sy = this.component.coOrdinateSystem.getViewScaleY();
-    const { x: cx, y: cy } = this.component.center;
-    const { x: tx, y: ty } = this.component.originDiagram;
-    const { x: stx, y: sty } = this.originalPoint;
-    const scalePoints = this.scalePoints(this.extentPoints, sx, sy);
-    let translatePoints = this.translatePoints(scalePoints, cx, cy);
-    translatePoints = this.translatePoints(translatePoints, tx, ty);
-    console.log(`comptent cx: ${cx} cy: ${cy} tx: ${stx} ty ${sty}`);
-    this.originalPoint = {
-      x: stx * sx + cx + tx,
-      y: sty * sy + cy + ty,
-    };
-    if (this.extentPoints[0].x < this.extentPoints[0].x) {
-      console.log("fanzhuan");
-    }
+    return this.extentPoints
+    // const viewScaleX = this.component?.coordinateSystem.getViewScaleX()
+    // const viewScaleY = this.component?.coordinateSystem.getViewScaleY()
+    // const { x: cx, y: cy } = this.component.center;
+    // const { x: tx, y: ty } = this.component.originDiagram;
+    // const { x: stx, y: sty } = this.originalPoint;
+    // const scalePoints = this.scalePoints(this.extentPoints, sx, sy);
+    // let translatePoints = this.translatePoints(scalePoints, cx, cy);
+    // translatePoints = this.translatePoints(translatePoints, tx, ty);
+    // console.log(`comptent cx: ${cx} cy: ${cy} tx: ${stx} ty ${sty}`);
+    // this.originalPoint = {
+    //   x: stx * sx + cx + tx,
+    //   y: sty * sy + cy + ty,
+    // };
+    // if (this.extentPoints[0].x < this.extentPoints[0].x) {
+    //   console.log("fanzhuan");
+    // }
 
-    console.log(
-      `originPoint x: ${this.originalPoint.x}  y: ${this.originalPoint.y}`
-    );
+    // console.log(
+    //   `originPoint x: ${this.originalPoint.x}  y: ${this.originalPoint.y}`
+    // );
 
-    translatePoints = this.translatePoints(translatePoints, stx * sx, sty * sy);
-    return translatePoints;
-    const { x: shapeTx, y: shapeTy } = this.originalPoint;
-    return this.translatePoints(this.extentPoints, shapeTx, shapeTy);
+    // translatePoints = this.translatePoints(translatePoints, stx * sx, sty * sy);
+    // return translatePoints;
+    // const { x: shapeTx, y: shapeTy } = this.originalPoint;
+    // return this.translatePoints(this.extentPoints, shapeTx, shapeTy);
   }
 
   /**
@@ -267,39 +276,40 @@ export default abstract class ShapeAnnotation {
    * @return {*}
    */
   public getIconPoints(): Point[] {
-    const sx = this.component.coOrdinateSystem.getViewScaleX();
-    const sy = this.component.coOrdinateSystem.getViewScaleY();
-    // 父组件缩放因子
-    const parentSx = this.component.parent.coOrdinateSystem.getViewScaleX();
-    const parentsy = this.component.parent.coOrdinateSystem.getViewScaleY();
-    const pFlipX = this.component.parent.coOrdinateSystem.flipX;
-    const pFlipY = this.component.parent.coOrdinateSystem.flipY;
-    const { x: pcx, y: pcy } = this.component.parent.center;
-    const { x: ptx, y: pty } = this.component.parent.originDiagram;
-    // 自己缩放适合的icon 尺寸，
+    return this.extentPoints
+    // const sx = this.component.coOrdinateSystem.getViewScaleX();
+    // const sy = this.component.coOrdinateSystem.getViewScaleY();
+    // // 父组件缩放因子
+    // const parentSx = this.component.parent.coOrdinateSystem.getViewScaleX();
+    // const parentsy = this.component.parent.coOrdinateSystem.getViewScaleY();
+    // const pFlipX = this.component.parent.coOrdinateSystem.flipX;
+    // const pFlipY = this.component.parent.coOrdinateSystem.flipY;
+    // const { x: pcx, y: pcy } = this.component.parent.center;
+    // const { x: ptx, y: pty } = this.component.parent.originDiagram;
+    // // 自己缩放适合的icon 尺寸，
 
-    const { x: cx, y: cy } = this.component.center;
-    const { x: tx, y: ty } = this.component.originDiagram;
-    const { x: stx, y: sty } = this.originalPoint;
+    // const { x: cx, y: cy } = this.component.center;
+    // const { x: tx, y: ty } = this.component.originDiagram;
+    // const { x: stx, y: sty } = this.originalPoint;
 
-    let iconPoints = this.scalePoints(
-      this.extentPoints,
-      sx * pFlipX,
-      sy * pFlipY
-    );
-    iconPoints = this.translatePoints(iconPoints, cx * pFlipX, cy * pFlipY);
-    iconPoints = this.translatePoints(iconPoints, tx * pFlipX, ty * pFlipY);
-    iconPoints = this.translatePoints(
-      iconPoints,
-      stx * sx * pFlipX,
-      sty * sy * pFlipY
-    );
+    // let iconPoints = this.scalePoints(
+    //   this.extentPoints,
+    //   sx * pFlipX,
+    //   sy * pFlipY
+    // );
+    // iconPoints = this.translatePoints(iconPoints, cx * pFlipX, cy * pFlipY);
+    // iconPoints = this.translatePoints(iconPoints, tx * pFlipX, ty * pFlipY);
+    // iconPoints = this.translatePoints(
+    //   iconPoints,
+    //   stx * sx * pFlipX,
+    //   sty * sy * pFlipY
+    // );
 
-    // 同父级一起缩放，采用父级中心点移动
-    iconPoints = this.scalePoints(iconPoints, parentSx, parentsy);
-    iconPoints = this.translatePoints(iconPoints, pcx, pcy);
-    iconPoints = this.translatePoints(iconPoints, ptx, pty);
-    return iconPoints;
+    // // 同父级一起缩放，采用父级中心点移动
+    // iconPoints = this.scalePoints(iconPoints, parentSx, parentsy);
+    // iconPoints = this.translatePoints(iconPoints, pcx, pcy);
+    // iconPoints = this.translatePoints(iconPoints, ptx, pty);
+    // return iconPoints;
   }
 
   /**

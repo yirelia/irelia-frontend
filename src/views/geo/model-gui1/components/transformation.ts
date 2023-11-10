@@ -59,7 +59,7 @@ export class Transformation {
    */
   public getDiagramTransformationMatrix() {
     // 处理逻辑为先旋转 // 移动 // 缩放
-    const martix = new DOMMatrix();
+    // const martix = new DOMMatrix();
     // martix.scale();
     // const transform = new Transform();
     // const rotation = this.component.rotation;
@@ -82,6 +82,7 @@ export class Transformation {
     // transform.scale(sx, sy);
     // transform.translate(backTx, backTy);
     // return transform.toString();
+    return ''
   }
 
   /**
@@ -89,45 +90,46 @@ export class Transformation {
    * @return {*}
    */
   public getIconTransformationMatrix() {
-    const transform = new Transform();
-    let iconRotation = this.component.rotation;
-    const { x: cx, y: cy } = this.component.center;
-    const { x: tx, y: ty } = this.component.originDiagram;
-    const pRotation = this.component.parent.rotation;
-    const { x: px, y: py } = this.component.parent.center;
-    const { x: ptx, y: pty } = this.component.parent.originDiagram;
-    const pSx = this.component.parent.coOrdinateSystem.getViewScaleX();
-    const pSy = this.component.parent.coOrdinateSystem.getViewScaleY();
-    // const preserveAspectRatio = this.component.coOrdinateSystem.getPreserveAspectRatio()
-    const parentFlipX = this.component.parent.coOrdinateSystem.flipX;
-    const parentFlipY = this.component.parent.coOrdinateSystem.flipY;
-    const pCx = px + ptx;
-    const pCy = py + pty;
+    // const transform = new Transform();
+    // let iconRotation = this.component.rotation;
+    // const { x: cx, y: cy } = this.component.center;
+    // const { x: tx, y: ty } = this.component.originDiagram;
+    // const pRotation = this.component.parent.rotation;
+    // const { x: px, y: py } = this.component.parent.center;
+    // const { x: ptx, y: pty } = this.component.parent.originDiagram;
+    // const pSx = this.component.parent.coOrdinateSystem.getViewScaleX();
+    // const pSy = this.component.parent.coOrdinateSystem.getViewScaleY();
+    // // const preserveAspectRatio = this.component.coOrdinateSystem.getPreserveAspectRatio()
+    // const parentFlipX = this.component.parent.coOrdinateSystem.flipX;
+    // const parentFlipY = this.component.parent.coOrdinateSystem.flipY;
+    // const pCx = px + ptx;
+    // const pCy = py + pty;
 
-    const iconCx = (cx + tx) * pSx * parentFlipX + pCx;
-    const iconCy = (cy + ty) * pSy * parentFlipY + pCy;
-    // get inputoupt scale
+    // const iconCx = (cx + tx) * pSx * parentFlipX + pCx;
+    // const iconCy = (cy + ty) * pSy * parentFlipY + pCy;
+    // // get inputoupt scale
 
-    let sx = this.component.coOrdinateSystem.flipX;
-    let sy = this.component.coOrdinateSystem.flipY;
+    // let sx = this.component.coOrdinateSystem.flipX;
+    // let sy = this.component.coOrdinateSystem.flipY;
 
-    const backTx = sx * iconCx;
-    const backTy = sy * iconCy;
-    const {
-      sx: rsx,
-      sy: rsy,
-      rotation,
-    } = this.reComputedIconFlip(parentFlipX, parentFlipY, sx, sy, iconRotation);
-    sx = rsx;
-    sy = rsy;
-    iconRotation = rotation;
+    // const backTx = sx * iconCx;
+    // const backTy = sy * iconCy;
+    // const {
+    //   sx: rsx,
+    //   sy: rsy,
+    //   rotation,
+    // } = this.reComputedIconFlip(parentFlipX, parentFlipY, sx, sy, iconRotation);
+    // sx = rsx;
+    // sy = rsy;
+    // iconRotation = rotation;
 
-    transform.rotate(pRotation, pCx, pCy);
-    transform.rotate(iconRotation, iconCx, iconCy);
-    transform.translate(-backTx, -backTy);
-    transform.scale(sx, sy);
-    transform.translate(backTx, backTy);
-    return transform.toString();
+    // transform.rotate(pRotation, pCx, pCy);
+    // transform.rotate(iconRotation, iconCx, iconCy);
+    // transform.translate(-backTx, -backTy);
+    // transform.scale(sx, sy);
+    // transform.translate(backTx, backTy);
+    // return transform.toString();
+    return ''
   }
 
   /**
