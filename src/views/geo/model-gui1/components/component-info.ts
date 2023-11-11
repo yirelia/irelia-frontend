@@ -38,10 +38,12 @@ export class ComponentInfo {
   public isConnector = false;
 
   constructor(viewScale = 1, componentInfo?: DiagramComponent) {
+    // 优先初始化
+    this.viewScale = viewScale;
     if (componentInfo) {
       this.updateComponentInfo(componentInfo);
     }
-    this.viewScale = viewScale;
+    
   }
 
   public updateComponentInfo(componentInfo: DiagramComponent) {
@@ -58,12 +60,16 @@ export class ComponentInfo {
       this.viewScale
     );
 
-    this.originDiagram = toPoint(componentInfo.originDiagram);
+    this.originDiagram = toPoint(componentInfo.originDiagram,  this.viewScale,
+      this.viewScale);
     // 重要坐标系角度转换
     this.rotation = -toNum(componentInfo.rotation);
 
     this.width = Math.abs(this.extent1Diagram.x - this.extent2Diagram.x);
     this.height = Math.abs(this.extent1Diagram.y - this.extent2Diagram.y);
+
+    this.x = Math.min(this.extent1Diagram.x, this.extent1Diagram.x)
+    this.y = Math.max(this.extent1Diagram.y, this.extent1Diagram.y)
 
     this.isConnector =
       componentInfo.graphType === ModelicaClasses.ExpandableConnector ||
@@ -102,4 +108,12 @@ export class ComponentInfo {
   public getSubShape() {
     return this.rawComponentInfo.subShapes;
   }
+
+  public getViewPosition() {
+    return {
+      x: this.x + this.originDiagram.x,
+      y: this.y + this.originDiagram.y
+    }
+  }
+
 }

@@ -13,7 +13,7 @@ import {
 import CoOrdinateSystem from "./coordinate-system";
 
 export class Component {
-  public componentInfo = new ComponentInfo();
+  public componentInfo: ComponentInfo;
 
   public graph: Graph;
 
@@ -24,7 +24,7 @@ export class Component {
   // 组件类型
   public componentType: ViewType;
 
-  static viewScale = ViewScale;
+  static viewScale =  ViewScale;
 
   public zIndex = ShapeLayer.ComponentZIndex;
 
@@ -84,6 +84,9 @@ export class Component {
    * @return {*}
    */
   public createNode() {
+    const position = this.componentInfo.getViewPosition()
+
+
     const markup = this.getMarkUp();
     const width =
       this.componentType === ViewType.Diagram
@@ -100,6 +103,8 @@ export class Component {
     const data = this.getData();
     return this.graph.createNode({
       id,
+      x: position.x,
+      y: position.y,
       width,
       height,
       markup,
@@ -107,6 +112,13 @@ export class Component {
       data,
       zIndex: this.zIndex,
     });
+  }
+  
+  public getNodePosition() {
+    return {
+      x: this.componentInfo.x + this.componentInfo.originDiagram.x,
+      y: this.componentInfo.y + this.componentInfo.originDiagram.y,
+    }
   }
 
   /**

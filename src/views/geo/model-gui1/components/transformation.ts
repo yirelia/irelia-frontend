@@ -33,6 +33,7 @@ export class Transformation {
 
   constructor(shape: ShapeAnnotation, component?: Component) {
     this.rawShape = shape;
+    this.shapeRotation = this.rawShape.rotation
     if (component) {
       this.component = component;
       this.width = this.component.componentInfo.width;
@@ -59,9 +60,8 @@ export class Transformation {
    */
   public getDiagramTransformationMatrix() {
     // 处理逻辑为先旋转 // 移动 // 缩放
-    // const martix = new DOMMatrix();
-    // martix.scale();
-    // const transform = new Transform();
+    const transform = new Transform();
+    // const componentRotation = this.component?.componentInfo.rotation
     // const rotation = this.component.rotation;
     // const { x: cx, y: cy } = this.component.center;
     // const { x: tx, y: ty } = this.component.originDiagram;
@@ -81,8 +81,7 @@ export class Transformation {
     // transform.translate(-backTx, -backTy);
     // transform.scale(sx, sy);
     // transform.translate(backTx, backTy);
-    // return transform.toString();
-    return ''
+    return transform.toString();
   }
 
   /**

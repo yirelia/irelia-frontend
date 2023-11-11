@@ -1,11 +1,11 @@
 import type { Graph } from "@antv/x6";
 import { Transformation } from "../components/transformation";
 import type { DiagramShape, Point } from "../model";
-import { convertMMToPixel, toNum, toPoint, toRgbColor } from "../utils";
+import { convertMMToPixel, getBigNumerIntance, toNum, toPoint, toRgbColor } from "../utils";
 import type { Component } from "../components/component";
 import { FillPattern, ViewScale, ViewType } from "../enums";
-import BigNumber from "bignumber.js";
 
+const BigNumber = getBigNumerIntance()
 export default abstract class ShapeAnnotation {
   // 方法需要使用
   public rawShape!: DiagramShape;
@@ -47,7 +47,7 @@ export default abstract class ShapeAnnotation {
   constructor(graph: Graph, shape: DiagramShape, component?: Component) {
     this.graph = graph;
     this.rawShape = shape;
-    if (this.component) {
+    if (component) {
       this.component = component;
     }
     this.initShapePoints(this.rawShape)
@@ -55,8 +55,9 @@ export default abstract class ShapeAnnotation {
     this.originalPoint = toPoint(shape.originalPoint);
     this.stroke = this.getStroke();
     this.color = toRgbColor(this.rawShape.color);
+    this.fill = this.getFillColor()
     this.strokeWidth = this.getStrokeWidth();
-    this.opacity = this.rawShape.opacity || 0;
+    this.opacity = this.rawShape.opacity === 0 ? 0 : 1;
     this.magnet = this.rawShape.magnet;
     this.isSmooth = this.rawShape.smooth === "smooth";
 
@@ -243,9 +244,19 @@ export default abstract class ShapeAnnotation {
    * @return {*}
    */
   public getDiagramPoints(): Point[] {
-    return this.extentPoints
-    // const viewScaleX = this.component?.coordinateSystem.getViewScaleX()
-    // const viewScaleY = this.component?.coordinateSystem.getViewScaleY()
+    const viewScaleX = this.component!.coordinateSystem.getViewScaleX()
+    const viewScaleY = this.component!.coordinateSystem.getViewScaleY()
+    const {x: shapeOriginX, y: shapeOriginY} = this.originalPoint
+    const scaledOriginPoint = {
+      x: new BigNumber(shapeOriginX).plus(viewScaleX).toNumber(),
+      y: new BigNumber(shapeOriginY).plus(viewScaleY).toNumber()
+    }
+    let viewPoints: Point[] = []
+    viewPoints = this.scalePoints(this.extentPoints, viewScaleX, viewScaleY)
+    viewPoints = this.translatePoints(viewPoints, scaledOriginPoint.x, scaledOriginPoint.y)
+    return viewPoints
+    
+    
     // const { x: cx, y: cy } = this.component.center;
     // const { x: tx, y: ty } = this.component.originDiagram;
     // const { x: stx, y: sty } = this.originalPoint;

@@ -19,10 +19,10 @@ export function toPoint(
   sy: number = 1
 ): Point {
   const [x, y] = strPoint.split(",").map((item) => toNum(item)) as PointTuple;
-  const ponintX = new BigNumber(x).plus(sx).toNumber();
+  const ponintX = new BigNumber(x).multipliedBy(sx).toNumber();
   // y 轴坐标转换
-  const poninty = new BigNumber(-y).plus(sy).toNumber();
-  return new Point(ponintX, -y * poninty);
+  const poninty = new BigNumber(-y).multipliedBy(sy).toNumber();
+  return new Point(ponintX, poninty);
 }
 
 /**
