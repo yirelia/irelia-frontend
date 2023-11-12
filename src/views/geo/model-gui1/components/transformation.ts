@@ -61,7 +61,23 @@ export class Transformation {
   public getDiagramTransformationMatrix() {
     // 处理逻辑为先旋转 // 移动 // 缩放
     const transform = new Transform();
-    // const componentRotation = this.component?.componentInfo.rotation
+    const componentInfo =  this.component!.componentInfo
+    const coordinateSystem = this.component!.coordinateSystem
+    const componentRotation = componentInfo.rotation
+    const componentCenter = coordinateSystem.getCenter()
+    const flipx = coordinateSystem.flipX
+    const flipy = coordinateSystem.flipY
+    const scaleOriginX = componentCenter.x
+    const scaleOriginY = componentCenter.y
+    transform.rotate(componentRotation, componentCenter.x, componentCenter.y)
+    if(this.rawShape.hasOriginPoint()) {
+      const shapeOriginPoint = this.rawShape.getViewOriginPoint()
+      transform.rotate(this.shapeRotation, shapeOriginPoint.x, shapeOriginPoint.y)
+    } else {
+      transform.rotate(this.shapeRotation, componentCenter.x, componentCenter.y)
+    }
+    transform.scale(flipx, flipy, scaleOriginX, scaleOriginY)
+
     // const rotation = this.component.rotation;
     // const { x: cx, y: cy } = this.component.center;
     // const { x: tx, y: ty } = this.component.originDiagram;
@@ -194,8 +210,14 @@ export class Transform {
 
   constructor() {}
 
-  public scale(sx: number, sy: number): Transform {
-    this.transform.push(`scale(${sx},${sy})`);
+  public scale(sx: number, sy: number, originX?: number, originY?: number): Transform {
+    if(originX != undefined && originY !=undefined) {
+      this.transform.push(`translate(${originX},${originY})`)
+      this.transform.push(`scale(${sx},${sy})`);
+      this.transform.push(`translate(${-originX},${-originY})`)
+    } else {
+      this.transform.push(`scale(${sx},${sy})`);
+    }
     return this;
   }
 

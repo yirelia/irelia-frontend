@@ -84,9 +84,8 @@ export class Component {
    * @return {*}
    */
   public createNode() {
-    const position = this.componentInfo.getViewPosition()
-
-
+    // 重要 中心点偏移量作为计算位置
+    const position = this.componentInfo.getViewCenter()
     const markup = this.getMarkUp();
     const width =
       this.componentType === ViewType.Diagram
@@ -115,10 +114,11 @@ export class Component {
   }
   
   public getNodePosition() {
-    return {
-      x: this.componentInfo.x + this.componentInfo.originDiagram.x,
-      y: this.componentInfo.y + this.componentInfo.originDiagram.y,
-    }
+    // return {
+    //   x: this.componentInfo.x,
+    //   y: this.componentInfo.y,
+    // }
+    return this.componentInfo.getViewCenter()
   }
 
   /**

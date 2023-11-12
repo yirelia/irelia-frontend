@@ -93,4 +93,19 @@ export default class CoordinateSystem {
   public setFlipY(flipY: number) {
     this.flipY = flipY;
   }
+
+  public getCenter() {
+    const extent = this.extent.map(point => {
+      return {
+        x: point.x * this.initialScale,
+        y: point.y * this.initialScale
+      }
+    })
+    const [p1, p2] = extent
+    return {
+      x: (p1.x + p2.x) / 2,
+      y: (p1.y + p2.y) / 2
+    }
+  }
+ 
 }

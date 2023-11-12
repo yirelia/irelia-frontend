@@ -60,16 +60,18 @@ export class ComponentInfo {
       this.viewScale
     );
 
-    this.originDiagram = toPoint(componentInfo.originDiagram,  this.viewScale,
+    this.originDiagram = toPoint(componentInfo.originDiagram, this.viewScale,
       this.viewScale);
     // 重要坐标系角度转换
     this.rotation = -toNum(componentInfo.rotation);
 
     this.width = Math.abs(this.extent1Diagram.x - this.extent2Diagram.x);
     this.height = Math.abs(this.extent1Diagram.y - this.extent2Diagram.y);
-
-    this.x = Math.min(this.extent1Diagram.x, this.extent1Diagram.x)
-    this.y = Math.max(this.extent1Diagram.y, this.extent1Diagram.y)
+    const position = this.getPoistion()
+    // this.x = Math.min(this.extent1Diagram.x, this.extent2Diagram.x)
+    // this.y = Math.max(this.extent1Diagram.y, this.extent2Diagram.y)
+    this.x = position.x
+    this.y = position.y
 
     this.isConnector =
       componentInfo.graphType === ModelicaClasses.ExpandableConnector ||
@@ -115,5 +117,18 @@ export class ComponentInfo {
       y: this.y + this.originDiagram.y
     }
   }
+
+ public getViewCenter() {
+  return {
+    x: this.center.x + this.originDiagram.x,
+    y: this.center.y + this.originDiagram.y
+  }
+ }
+
+ public getPoistion() {
+  const x = this.center.x - this.width / 2
+  const y = this.center.y - this.height / 2
+  return {x, y}
+ }
 
 }

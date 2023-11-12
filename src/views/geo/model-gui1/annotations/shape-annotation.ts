@@ -37,6 +37,10 @@ export default abstract class ShapeAnnotation {
   public opacity = 1;
   public magnet = false;
 
+  public hasOriginPointX = true
+
+  public hasOriginPointY = true
+
   // 是否为注释图形
   public isDiagram = false;
   // 
@@ -224,8 +228,8 @@ export default abstract class ShapeAnnotation {
   public scalePoints(points: Point[], sx: number, sy: number) {
     return points.map((point) => {
       return {
-        x: point.x * sx,
-        y: point.y * sy,
+        x: new BigNumber(point.x).multipliedBy(sx).toNumber(),
+        y: new BigNumber(point.y).multipliedBy(sy).toNumber(),
       };
     });
   }
@@ -233,8 +237,8 @@ export default abstract class ShapeAnnotation {
   public translatePoints(points: Point[], tx: number, ty: number) {
     return points.map((point) => {
       return {
-        x: point.x + tx,
-        y: point.y + ty,
+        x: new BigNumber(point.x).plus(tx).toNumber(),
+        y: new BigNumber(point.y).plus(ty).toNumber(),
       };
     });
   }
@@ -253,7 +257,7 @@ export default abstract class ShapeAnnotation {
     }
     let viewPoints: Point[] = []
     viewPoints = this.scalePoints(this.extentPoints, viewScaleX, viewScaleY)
-    viewPoints = this.translatePoints(viewPoints, scaledOriginPoint.x, scaledOriginPoint.y)
+    // viewPoints = this.translatePoints(viewPoints, scaledOriginPoint.x, scaledOriginPoint.y)
     return viewPoints
     
     
@@ -354,5 +358,23 @@ export default abstract class ShapeAnnotation {
       x,
       y,
     };
+  }
+
+  public hasOriginPoint() {
+    return this.originalPoint.x && this.originalPoint.y
+  }
+
+  /**
+   * @description: 获取图形在画布视图上的中心店
+   * @return {*}
+   */  
+  public getViewOriginPoint(): Point {
+    const viewScaleX = this.component!.coordinateSystem.getViewScaleX()
+    const viewScaleY = this.component!.coordinateSystem.getViewScaleY()
+    const {x: shapeOriginX, y: shapeOriginY} = this.originalPoint
+    return  {
+      x: new BigNumber(shapeOriginX).multipliedBy(viewScaleX).toNumber(),
+      y: new BigNumber(shapeOriginY).multipliedBy(viewScaleY).toNumber()
+    }
   }
 }
