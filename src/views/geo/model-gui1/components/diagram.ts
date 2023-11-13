@@ -68,9 +68,8 @@ export class Diagram {
   public createNode() {
     const markup = this.getMarkUp();
     const { zIndex } = this;
+    // 此处坐标系就是原点，不需要移动
     return {
-      x: 0,
-      y: 0,
       zIndex: zIndex,
       markup: [markup],
     };

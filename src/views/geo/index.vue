@@ -9,6 +9,9 @@ import { Component } from "./model-gui1/components/component";
 import { ViewType } from "./model-gui1/enums/index";
 import pidJson from "./pid.json";
 import Clock from "./clock.json";
+import Graphics from './graphic.json'
+import { Diagram } from "./model-gui1/components/diagram";
+import { ComponentEdge } from "./model-gui1/components/edge";
 const geogery = {
   classname: "Modelica.Clocked.ClockSignals.Interfaces.PartialPeriodicClock",
   comment: "",
@@ -3657,6 +3660,12 @@ onMounted(() => {
     panning: true,
     mousewheel: true,
   });
+  const diagrams = Graphics[0].filter(diagram => diagram.diagram)
+  const edges  = Graphics[0].filter(diagram => !diagram.diagram)
+  for(const item of diagrams) {
+   const node =  new Diagram(graph, item).createNode()
+   graph.addNode(node)
+  }
   for (const ge of components) {
     const parentComponent = new Component(graph, ge as any);
     const node = parentComponent.createNode();
@@ -3672,6 +3681,10 @@ onMounted(() => {
       const cNode = graph.addNode(childNode);
       node.addChild(cNode);
     }
+  }
+
+  for(const edge of edges) {
+    new ComponentEdge(graph, edge).addEdge()
   }
 
   graph.addNode({
@@ -3698,7 +3711,6 @@ onMounted(() => {
       },
     ],
   });
-
   graph.centerContent();
 });
 </script>
