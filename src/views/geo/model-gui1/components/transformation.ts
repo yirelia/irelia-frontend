@@ -28,7 +28,10 @@ export class Transformation {
 
   public rawShape: ShapeAnnotation;
 
-  public viewType = ViewType.Diagram;
+  // 默认为视图层
+  public viewType = ViewType.View;
+
+  public transfrom = new Transform();
 
   constructor(shape: ShapeAnnotation, component?: Component) {
     this.rawShape = shape;
@@ -41,16 +44,29 @@ export class Transformation {
     }
   }
 
+  /**
+   * @description:
+   * @return {*}
+   */
   public getTransformationMatrix() {
     switch (this.viewType) {
       case ViewType.View:
-        // TODO
-        return "";
+        return this.getViewDiagramTransformationMatrix();
       case ViewType.Diagram:
         return this.getDiagramTransformationMatrix();
       default:
         return this.getIconTransformationMatrix();
     }
+  }
+
+  /**
+   * @description: 获取视图中diagram 背景注释变换
+   *
+   * @return {*}
+   */
+  public getViewDiagramTransformationMatrix(): string {
+    // TODO 添加新的变换信息，暂时没有遇到具体的变换信息
+    return this.transfrom.toString();
   }
 
   /**
@@ -117,6 +133,7 @@ export class Transformation {
 
   /**
    * @description: 根据root 组件 翻转场景 重新计算icon 组件的翻转&& 旋转角度
+   * TODO  此处为枚举处理，后续是否有优化方案？？？
    * @param {number} rootScaleX
    * @param {number} rootScaleY
    * @param {number} iconScaleX

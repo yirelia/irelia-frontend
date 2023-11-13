@@ -1,11 +1,17 @@
 import type { Graph } from "@antv/x6";
 import { Transformation } from "../components/transformation";
 import type { DiagramShape, Point } from "../model";
-import { convertMMToPixel, getBigNumerIntance, toNum, toPoint, toRgbColor } from "../utils";
+import {
+  convertMMToPixel,
+  getBigNumerIntance,
+  toNum,
+  toPoint,
+  toRgbColor,
+} from "../utils";
 import type { Component } from "../components/component";
 import { FillPattern, ViewScale, ViewType } from "../enums";
 
-const BigNumber = getBigNumerIntance()
+const BigNumber = getBigNumerIntance();
 export default abstract class ShapeAnnotation {
   // 方法需要使用
   public rawShape!: DiagramShape;
@@ -37,14 +43,14 @@ export default abstract class ShapeAnnotation {
   public opacity = 1;
   public magnet = false;
 
-  public hasOriginPointX = true
+  public hasOriginPointX = true;
 
-  public hasOriginPointY = true
+  public hasOriginPointY = true;
 
   // 是否为注释图形
   public isDiagram = false;
-  // 
-  public xlinkHref = ''
+  //
+  public xlinkHref = "";
 
   // 默认的缩放比例
   public viewScale = ViewScale;
@@ -54,12 +60,12 @@ export default abstract class ShapeAnnotation {
     if (component) {
       this.component = component;
     }
-    this.initShapePoints(this.rawShape)
+    this.initShapePoints(this.rawShape);
     this.rotation = -toNum(shape.rotation);
     this.originalPoint = toPoint(shape.originalPoint);
     this.stroke = this.getStroke();
     this.color = toRgbColor(this.rawShape.color);
-    this.fill = this.getFillColor()
+    this.fill = this.getFillColor();
     this.strokeWidth = this.getStrokeWidth();
     this.opacity = this.rawShape.opacity === 0 ? 0 : 1;
     this.magnet = this.rawShape.magnet;
@@ -70,11 +76,12 @@ export default abstract class ShapeAnnotation {
         ? this.component?.componentInfo.name || ""
         : this.rawShape.originalTextString;
     this.isDiagram = this.rawShape.diagram || false;
-    this.strokeDasharray = this.rawShape.linePattern !== 'LinePattern.Solid' ? 5 : 0;
-    if(this.rawShape.imageBase64) {
-      this.xlinkHref = `data:image/png;base64,${this.rawShape.imageBase64}`
+    this.strokeDasharray =
+      this.rawShape.linePattern !== "LinePattern.Solid" ? 5 : 0;
+    if (this.rawShape.imageBase64) {
+      this.xlinkHref = `data:image/png;base64,${this.rawShape.imageBase64}`;
     }
-    this.transformation = new Transformation(this, this.component)
+    this.transformation = new Transformation(this, this.component);
   }
 
   public initShapePoints(shape: DiagramShape) {
@@ -248,17 +255,22 @@ export default abstract class ShapeAnnotation {
    * @return {*}
    */
   public getDiagramPoints(): Point[] {
-    const viewScaleX = this.component!.coordinateSystem.getViewScaleX()
-    const viewScaleY = this.component!.coordinateSystem.getViewScaleY()
-    const {x: shapeOriginX, y: shapeOriginY} = this.originalPoint
+    const viewScaleX = this.component!.coordinateSystem.getViewScaleX();
+    const viewScaleY = this.component!.coordinateSystem.getViewScaleY();
+    const { x: shapeOriginX, y: shapeOriginY } = this.originalPoint;
+    // 缩放坐标
     const scaledOriginPoint = {
       x: new BigNumber(shapeOriginX).multipliedBy(viewScaleX).toNumber(),
-      y: new BigNumber(shapeOriginY).multipliedBy(viewScaleY).toNumber()
-    }
-    let viewPoints: Point[] = []
-    viewPoints = this.scalePoints(this.extentPoints, viewScaleX, viewScaleY)
-    viewPoints = this.translatePoints(viewPoints, scaledOriginPoint.x, scaledOriginPoint.y)
-    return viewPoints
+      y: new BigNumber(shapeOriginY).multipliedBy(viewScaleY).toNumber(),
+    };
+    let viewPoints: Point[] = [];
+    viewPoints = this.scalePoints(this.extentPoints, viewScaleX, viewScaleY);
+    viewPoints = this.translatePoints(
+      viewPoints,
+      scaledOriginPoint.x,
+      scaledOriginPoint.y
+    );
+    return viewPoints;
   }
 
   /**
@@ -268,23 +280,28 @@ export default abstract class ShapeAnnotation {
   public getIconPoints(): Point[] {
     const viewScaleX = this.component!.coordinateSystem.getViewScaleX();
     const viewScaleY = this.component!.coordinateSystem.getViewScaleY();
-    const parentViewScaleX = this.component!.parentComponent!.coordinateSystem.getViewScaleX();
-    const parentViewScaleY = this.component!.parentComponent!.coordinateSystem.getViewScaleY();
-    const parentFlipX = this.component!.parentComponent!.coordinateSystem.flipX
+    const parentViewScaleX =
+      this.component!.parentComponent!.coordinateSystem.getViewScaleX();
+    const parentViewScaleY =
+      this.component!.parentComponent!.coordinateSystem.getViewScaleY();
+    const parentFlipX = this.component!.parentComponent!.coordinateSystem.flipX;
     const parentFlipY = this.component!.parentComponent!.coordinateSystem.flipY;
-    const {x: shapeOriginX, y: shapeOriginY} = this.originalPoint
+    const { x: shapeOriginX, y: shapeOriginY } = this.originalPoint;
 
-    
-    const sx = viewScaleX * parentViewScaleX * parentFlipX
-    const sy = viewScaleY * parentViewScaleY * parentFlipY
+    const sx = viewScaleX * parentViewScaleX * parentFlipX;
+    const sy = viewScaleY * parentViewScaleY * parentFlipY;
     const scaledOriginPoint = {
       x: new BigNumber(shapeOriginX).multipliedBy(sx).toNumber(),
-      y: new BigNumber(shapeOriginY).multipliedBy(sy).toNumber()
-    } 
-    let viewPoints: Point[] = []
-    viewPoints = this.scalePoints(this.extentPoints, sx, sy)
-    viewPoints = this.translatePoints(viewPoints, scaledOriginPoint.x, scaledOriginPoint.y)
-    return viewPoints
+      y: new BigNumber(shapeOriginY).multipliedBy(sy).toNumber(),
+    };
+    let viewPoints: Point[] = [];
+    viewPoints = this.scalePoints(this.extentPoints, sx, sy);
+    viewPoints = this.translatePoints(
+      viewPoints,
+      scaledOriginPoint.x,
+      scaledOriginPoint.y
+    );
+    return viewPoints;
   }
 
   /**
@@ -321,20 +338,20 @@ export default abstract class ShapeAnnotation {
   }
 
   public hasOriginPoint() {
-    return this.originalPoint.x && this.originalPoint.y
+    return this.originalPoint.x && this.originalPoint.y;
   }
 
   /**
    * @description: 获取图形在画布视图上的中心店
    * @return {*}
-   */  
+   */
   public getViewOriginPoint(): Point {
-    const viewScaleX = this.component!.coordinateSystem.getViewScaleX()
-    const viewScaleY = this.component!.coordinateSystem.getViewScaleY()
-    const {x: shapeOriginX, y: shapeOriginY} = this.originalPoint
-    return  {
+    const viewScaleX = this.component!.coordinateSystem.getViewScaleX();
+    const viewScaleY = this.component!.coordinateSystem.getViewScaleY();
+    const { x: shapeOriginX, y: shapeOriginY } = this.originalPoint;
+    return {
       x: new BigNumber(shapeOriginX).multipliedBy(viewScaleX).toNumber(),
-      y: new BigNumber(shapeOriginY).multipliedBy(viewScaleY).toNumber()
-    }
+      y: new BigNumber(shapeOriginY).multipliedBy(viewScaleY).toNumber(),
+    };
   }
 }

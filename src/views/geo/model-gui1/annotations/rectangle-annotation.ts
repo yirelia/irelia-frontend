@@ -1,9 +1,9 @@
-import BigNumber from 'bignumber.js';
-import type { DiagramShape } from '../model';
-import ShapeAnnotation from './shape-annotation';
-import { ShapeType } from '../enums';
-import type { Graph } from '@antv/x6';
-import type { Component } from '../components/component';
+import BigNumber from "bignumber.js";
+import type { DiagramShape } from "../model";
+import ShapeAnnotation from "./shape-annotation";
+import { ShapeType } from "../enums";
+import type { Graph } from "@antv/x6";
+import type { Component } from "../components/component";
 
 export default class RectangleAnnotation extends ShapeAnnotation {
   tag = ShapeType.Rectangle;
@@ -12,15 +12,15 @@ export default class RectangleAnnotation extends ShapeAnnotation {
     super(graph, shape, component);
   }
 
-
   public markup() {
-    const { strokeDasharray, stroke, strokeWidth, radius, opacity, magnet } = this;
+    const { strokeDasharray, stroke, strokeWidth, radius, opacity, magnet } =
+      this;
     const [p1, p2] = this.getPathPoint();
     const { x, y, width, height } = this.getBox(p1, p2);
     const d = this.getDPath(x, y, width, height, radius);
     const transform = this.transformation.getTransformationMatrix();
     return {
-      tagName: 'path',
+      tagName: "path",
       attrs: {
         d,
         fill: this.fill,
@@ -29,8 +29,8 @@ export default class RectangleAnnotation extends ShapeAnnotation {
         strokeDasharray,
         transform,
         opacity,
-        magnet
-      }
+        magnet,
+      },
     };
   }
 
@@ -71,30 +71,30 @@ export default class RectangleAnnotation extends ShapeAnnotation {
     const rightTop2 = { x: rightBottomX.toNumber(), y: leftTopY.toNumber() };
     const rightTp3 = {
       x: rightBottomX.toNumber(),
-      y: leftTopY.plus(radisuBigNum).toNumber()
+      y: leftTopY.plus(radisuBigNum).toNumber(),
     };
 
     const rightBottom1 = {
       x: rightBottomX.toNumber(),
-      y: rightBottomY.minus(radisuBigNum).toNumber()
+      y: rightBottomY.minus(radisuBigNum).toNumber(),
     };
     const rightBottom2 = {
       x: rightBottomX.toNumber(),
-      y: rightBottomY.toNumber()
+      y: rightBottomY.toNumber(),
     };
     const rightBottom3 = {
       x: rightBottomX.minus(radisuBigNum).toNumber(),
-      y: rightBottomY.toNumber()
+      y: rightBottomY.toNumber(),
     };
 
     const letBottom1 = {
       x: leftTopX.plus(radisuBigNum).toNumber(),
-      y: rightBottomY.toNumber()
+      y: rightBottomY.toNumber(),
     };
     const leftBottom2 = { x: leftTopX.toNumber(), y: rightBottomY.toNumber() };
     const leftBottom3 = {
       x: leftTopX.toNumber(),
-      y: rightBottomY.minus(radisuBigNum).toNumber()
+      y: rightBottomY.minus(radisuBigNum).toNumber(),
     };
 
     return `M${leftTop1.x}, ${leftTop1.y}
@@ -117,21 +117,21 @@ export default class RectangleAnnotation extends ShapeAnnotation {
 export const makeDefaultRectangle = (rectangle: Partial<DiagramShape>) => {
   const { extentsPoints, magnet, opacity } = rectangle;
   return {
-    borderPattern: 'BorderPattern.None',
-    color: '255,255,255',
+    borderPattern: "BorderPattern.None",
+    color: "255,255,255",
     points: [],
     extentsPoints,
-    fillColor: '192,192,192',
-    fillPattern: 'FillPattern.Solid',
-    linePattern: 'LinePattern.none',
-    lineThickness: '0.25',
-    originalPoint: '0.0,0.0',
-    radius: '0.0',
-    rotation: '0.0',
-    type: 'Rectangle',
-    visible: 'true',
+    fillColor: "192,192,192",
+    fillPattern: "FillPattern.Solid",
+    linePattern: "LinePattern.none",
+    lineThickness: "0.25",
+    originalPoint: "0.0,0.0",
+    radius: "0.0",
+    rotation: "0.0",
+    type: "Rectangle",
+    visible: "true",
     magnet,
     opacity,
-    isCustom: true
+    isCustom: true,
   };
 };
