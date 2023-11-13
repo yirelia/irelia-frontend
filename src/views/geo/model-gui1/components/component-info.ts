@@ -67,15 +67,14 @@ export class ComponentInfo {
 
     this.width = Math.abs(this.extent1Diagram.x - this.extent2Diagram.x);
     this.height = Math.abs(this.extent1Diagram.y - this.extent2Diagram.y);
-    const position = this.getPoistion()
-    // this.x = Math.min(this.extent1Diagram.x, this.extent2Diagram.x)
-    // this.y = Math.max(this.extent1Diagram.y, this.extent2Diagram.y)
-    this.x = position.x
-    this.y = position.y
-
+    const viewCenter = this.getViewCenter()
+    // 中心店才是 node 节点便宜量
+    this.x = viewCenter.x
+    this.y = viewCenter.y
     this.isConnector =
       componentInfo.graphType === ModelicaClasses.ExpandableConnector ||
       componentInfo.graphType === ModelicaClasses.Connector;
+    this.name = this.rawComponentInfo.name
   }
 
   /**
@@ -123,12 +122,6 @@ export class ComponentInfo {
     x: this.center.x + this.originDiagram.x,
     y: this.center.y + this.originDiagram.y
   }
- }
-
- public getPoistion() {
-  const x = this.center.x - this.width / 2
-  const y = this.center.y - this.height / 2
-  return {x, y}
  }
 
 }

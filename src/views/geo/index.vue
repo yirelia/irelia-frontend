@@ -6,7 +6,7 @@ import { Graph } from "@antv/x6";
 import { onMounted, ref } from "vue";
 // import { Component } from "./model-gui/component/component";
 import { Component } from "./model-gui1/components/component";
-import GeoJson from './geo.json'
+import { ViewType } from "./model-gui1/enums/index";
 // const geogery = {
 //   classname: "Modelica.Clocked.ClockSignals.Interfaces.PartialPeriodicClock",
 //   comment: "",
@@ -527,6 +527,7 @@ const geogery = {
   visibleList: null,
 };
 const components =     [
+    geogery,
         {
             "classname": "Modelica.Blocks.Continuous.LimPID",
             "comment": "",
@@ -544,8 +545,8 @@ const components =     [
                 "initial_scale": 0.1
             },
             "extend_name": "Modelica.Blocks.Examples.PID_Controller",
-            "extent1Diagram": "-56.0,-20.0",
-            "extent2Diagram": "-36.0,0.0",
+            "extent1Diagram": "-36,-20.0",
+            "extent2Diagram": "-56.0,0.0",
             "graphType": "block",
             "inputOutputs": [
                 {
@@ -773,7 +774,7 @@ const components =     [
             "output_type": "[]",
             "parent": "",
             "rotateAngle": "0",
-            "rotation": "0",
+            "rotation": "90",
             "subShapes": [
                 {
                     "borderPattern": "BorderPattern.None",
@@ -4213,8 +4214,15 @@ onMounted(() => {
 
   for(const ge of components) {
     const parentComponent = new Component(graph, ge as any);
-  const node = parentComponent.createNode();
-  graph.addNode(node);
+    const node = parentComponent.createNode();
+    graph.addNode(node);
+    for(const input of ge.inputOutputs) {
+        const inputComponet = new Component(graph, input as any, ViewType.Icon, parentComponent)
+        const childNode = inputComponet.createNode()
+        const cNode = graph.addNode(childNode)
+        node.addChild(cNode)
+    }
+
   }
  
   graph.addNode({

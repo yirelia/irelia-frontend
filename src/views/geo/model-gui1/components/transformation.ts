@@ -2,6 +2,7 @@ import { ViewScale } from "./../../model-gui/enums/index";
 import type ShapeAnnotation from "../annotations/shape-annotation";
 import { ViewType } from "../enums";
 import type { Component } from "./component";
+import { Point } from "../model";
 
 export class Transformation {
   public width = 200;
@@ -77,26 +78,6 @@ export class Transformation {
       transform.rotate(this.shapeRotation, componentCenter.x, componentCenter.y)
     }
     transform.scale(flipx, flipy, scaleOriginX, scaleOriginY)
-
-    // const rotation = this.component.rotation;
-    // const { x: cx, y: cy } = this.component.center;
-    // const { x: tx, y: ty } = this.component.originDiagram;
-    // const sx = this.component.coOrdinateSystem.flipX;
-    // const sy = this.component.coOrdinateSystem.flipY;
-    // const psx = this.component.coOrdinateSystem.getViewScaleX();
-    // const psy = this.component.coOrdinateSystem.getViewScaleY();
-    // const { x: stx, y: sty } = this.shape.originalPoint;
-
-    // const diagramTx = tx + cx;
-    // const diagramTy = ty + cy;
-    // const backTx = sx * diagramTx;
-    // const backTy = sy * diagramTy;
-    // transform.rotate(rotation, diagramTx, diagramTy);
-    // // transform.rotate(this.shape.rotation, diagramTx, diagramTy);
-    // transform.rotate(this.shape.rotation, stx, sty);
-    // transform.translate(-backTx, -backTy);
-    // transform.scale(sx, sy);
-    // transform.translate(backTx, backTy);
     return transform.toString();
   }
 
@@ -105,46 +86,36 @@ export class Transformation {
    * @return {*}
    */
   public getIconTransformationMatrix() {
-    // const transform = new Transform();
-    // let iconRotation = this.component.rotation;
-    // const { x: cx, y: cy } = this.component.center;
-    // const { x: tx, y: ty } = this.component.originDiagram;
-    // const pRotation = this.component.parent.rotation;
-    // const { x: px, y: py } = this.component.parent.center;
-    // const { x: ptx, y: pty } = this.component.parent.originDiagram;
-    // const pSx = this.component.parent.coOrdinateSystem.getViewScaleX();
-    // const pSy = this.component.parent.coOrdinateSystem.getViewScaleY();
-    // // const preserveAspectRatio = this.component.coOrdinateSystem.getPreserveAspectRatio()
-    // const parentFlipX = this.component.parent.coOrdinateSystem.flipX;
-    // const parentFlipY = this.component.parent.coOrdinateSystem.flipY;
-    // const pCx = px + ptx;
-    // const pCy = py + pty;
-
-    // const iconCx = (cx + tx) * pSx * parentFlipX + pCx;
-    // const iconCy = (cy + ty) * pSy * parentFlipY + pCy;
-    // // get inputoupt scale
-
-    // let sx = this.component.coOrdinateSystem.flipX;
-    // let sy = this.component.coOrdinateSystem.flipY;
-
-    // const backTx = sx * iconCx;
-    // const backTy = sy * iconCy;
-    // const {
-    //   sx: rsx,
-    //   sy: rsy,
-    //   rotation,
-    // } = this.reComputedIconFlip(parentFlipX, parentFlipY, sx, sy, iconRotation);
-    // sx = rsx;
-    // sy = rsy;
-    // iconRotation = rotation;
-
-    // transform.rotate(pRotation, pCx, pCy);
-    // transform.rotate(iconRotation, iconCx, iconCy);
-    // transform.translate(-backTx, -backTy);
-    // transform.scale(sx, sy);
-    // transform.translate(backTx, backTy);
-    // return transform.toString();
-    return ''
+    const transform = new Transform();
+    const componentInfo =  this.component!.componentInfo
+    const coordinateSystem = this.component!.coordinateSystem
+    const parentComponentInfo = this.component!.parentComponent!.componentInfo
+    const parentCooesinteSystem = this.component!.parentComponent!.coordinateSystem
+    const componentRotation = componentInfo.rotation
+    const parentCenter = parentComponentInfo.getViewCenter()
+    const sx = coordinateSystem.viewScaleX * parentCooesinteSystem.viewScaleX
+    const sy = coordinateSystem.viewScaleY * parentCooesinteSystem.viewScaleY
+    // const componentCenter = componentInfo.getViewCenter()
+    // const toDiagramCenter = {
+    //   x : componentCenter.x * coordinateSystem.viewScaleX * parentCooesinteSystem.viewScaleX,
+    //   y : componentCenter.y * coordinateSystem.viewScaleY * parentCooesinteSystem.viewScaleY,
+    // }
+    let componentCenter: Point
+    if(componentInfo.originDiagram.x && componentInfo.originDiagram.y) {
+      componentCenter = {
+        x: componentInfo.originDiagram.x * parentCooesinteSystem.viewScaleX,
+        y: componentInfo.originDiagram.y * parentCooesinteSystem.viewScaleY,
+      }
+    } else {
+      componentCenter = {
+        x: componentInfo.center.x * parentCooesinteSystem.viewScaleX,
+        y: componentInfo.center.y * parentCooesinteSystem.viewScaleY
+      }
+    }
+    // 父级组件旋转
+    transform.rotate(parentComponentInfo.rotation, parentCenter.x, parentCenter.y)
+    .rotate(componentInfo.rotation)
+    return transform.toString();
   }
 
   /**
