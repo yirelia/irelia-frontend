@@ -1,6 +1,6 @@
-import type ShapeAnnotation from '../annotations/shape-annotation';
-import { ViewType } from '../enums';
-import type { Component } from './component';
+import type ShapeAnnotation from "../annotations/shape-annotation";
+import { ViewType } from "../enums";
+import type { Component } from "./component";
 
 export class Transformation {
   // 图表视图的实际宽 默认为 200
@@ -47,7 +47,6 @@ export class Transformation {
     const psy = this.component.coOrdinateSystem.getViewScaleY();
     const { x: stx, y: sty } = this.shape.originalPoint;
 
-
     const diagramTx = tx + cx;
     const diagramTy = ty + cy;
     const backTx = sx * diagramTx;
@@ -93,7 +92,7 @@ export class Transformation {
     const {
       sx: rsx,
       sy: rsy,
-      rotation
+      rotation,
     } = this.reComputedIconFlip(parentFlipX, parentFlipY, sx, sy, iconRotation);
     sx = rsx;
     sy = rsy;
@@ -128,7 +127,7 @@ export class Transformation {
       return {
         sx: iconScaleX,
         sy: iconScaleY,
-        rotation
+        rotation,
       };
       // root 组件 垂直翻转
     } else if (rootScaleX > 0 && rootScaleY < 0) {
@@ -140,7 +139,7 @@ export class Transformation {
       return {
         sx: iconScaleX,
         sy: iconScaleY,
-        rotation
+        rotation,
       };
       // root 组件 水平翻转
     } else if (rootScaleX < 0 && rootScaleY > 0) {
@@ -152,14 +151,14 @@ export class Transformation {
       return {
         sx: iconScaleX,
         sy: iconScaleY,
-        rotation
+        rotation,
       };
       // root 组件水平垂直翻转
     } else {
       return {
         sx: iconScaleX,
         sy: iconScaleY,
-        rotation
+        rotation,
       };
     }
   }
@@ -190,6 +189,6 @@ export class Transform {
   }
 
   public toString() {
-    return this.transform.join(' ');
+    return this.transform.join(" ");
   }
 }

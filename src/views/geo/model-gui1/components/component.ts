@@ -11,7 +11,6 @@ import {
   TextAnnotation,
 } from "../annotations";
 import CoOrdinateSystem from "./coordinate-system";
-import { getBigNumerIntance } from "../utils";
 
 export class Component {
   public componentInfo: ComponentInfo;
@@ -25,7 +24,7 @@ export class Component {
   // 组件类型
   public componentType: ViewType;
 
-  static viewScale =  ViewScale;
+  static viewScale = ViewScale;
 
   public zIndex = ShapeLayer.ComponentZIndex;
 
@@ -86,13 +85,13 @@ export class Component {
    */
   public createNode() {
     // 重要 中心点偏移量作为计算位置
-    const position =  this.getNodePosition()
+    const position = this.getNodePosition();
     const markup = this.getMarkUp();
-    const width =this.componentInfo.width
-    const height = this.componentInfo.height
+    const width = this.componentInfo.width;
+    const height = this.componentInfo.height;
     const id = this.getComponentId();
     const data = this.getData();
-    return this.graph.createNode({
+    const node = this.graph.createNode({
       id,
       x: position.x,
       y: position.y,
@@ -102,17 +101,22 @@ export class Component {
       data,
       zIndex: this.zIndex,
     });
+    if (this.componentType === ViewType.Icon) {
+      const rotation = this.parentComponent?.componentInfo.rotation || 0;
+      const center = this.parentComponent?.componentInfo.getViewCenter();
+      node.rotate(rotation, { absolute: true, center });
+    }
+    return node;
   }
-  
 
   /**
    * @description: 获取节点位置
    * @return {*}
-   */  
+   */
   public getNodePosition() {
-    const viewCenter = this.componentInfo.getViewCenter()
-    if(this.componentType === ViewType.Diagram) {
-      return viewCenter
+    const viewCenter = this.componentInfo.getViewCenter();
+    if (this.componentType === ViewType.Diagram) {
+      return viewCenter;
     }
     const parentViewSx = this.parentComponent!.coordinateSystem.getViewScaleX();
     const parentViewSY = this.parentComponent!.coordinateSystem.getViewScaleY();
@@ -121,8 +125,8 @@ export class Component {
     const parentFlipY = this.parentComponent!.coordinateSystem.flipY;
     return {
       x: viewCenter.x * parentViewSx * parentFlipX + parentCenter.x,
-      y: viewCenter.y * parentViewSY * parentFlipY + parentCenter.y
-    }
+      y: viewCenter.y * parentViewSY * parentFlipY + parentCenter.y,
+    };
   }
 
   /**
@@ -133,7 +137,9 @@ export class Component {
   public getComponentId(): string {
     return this.componentType === ViewType.Diagram
       ? this.componentInfo.name
-      : `${this.parentComponent!.componentInfo.name}.${this.componentInfo.name}`;
+      : `${this.parentComponent!.componentInfo.name}.${
+          this.componentInfo.name
+        }`;
   }
 
   public getData() {

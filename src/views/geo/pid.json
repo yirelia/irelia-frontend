@@ -1,0 +1,402 @@
+[
+    {
+        "classname": "Modelica.Blocks.Continuous.LimPID",
+        "comment": "",
+        "connector_sizing": "",
+        "coordinate_system": {
+            "extent1_diagram": [
+                -100,
+                -100
+            ],
+            "extent2_diagram": [
+                100,
+                100
+            ],
+            "preserve_aspect_ratio": true,
+            "initial_scale": 0.1
+        },
+        "extend_name": "testRotate",
+        "extent1Diagram": "-10.0,-10.0",
+        "extent2Diagram": "10.0,10.0",
+        "graphType": "block",
+        "inputOutputs": [
+            {
+                "classname": "Modelica.Blocks.Interfaces.RealInput",
+                "comment": "Connector of setpoint input signal",
+                "connector_sizing": "",
+                "coordinate_system": {
+                    "extent1_diagram": [
+                        -100,
+                        -100
+                    ],
+                    "extent2_diagram": [
+                        100,
+                        100
+                    ],
+                    "preserve_aspect_ratio": true,
+                    "initial_scale": 0.2
+                },
+                "extend_name": "Modelica.Blocks.Interfaces.SVcontrol",
+                "extent1Diagram": "-140.0,-20.0",
+                "extent2Diagram": "-100.0,20.0",
+                "graphType": "connector",
+                "inputOutputs": [],
+                "is_extend": true,
+                "mobility": false,
+                "name": "u_s",
+                "originDiagram": "-,-",
+                "original_name": "u_s",
+                "output_type": "[]",
+                "parent": "PID",
+                "rotateAngle": "0",
+                "rotation": "0",
+                "subShapes": [
+                    {
+                        "color": "0,0,127",
+                        "fillColor": "0,0,127",
+                        "fillPattern": "FillPattern.Solid",
+                        "linePattern": "LinePattern.Solid",
+                        "lineThickness": "0.25",
+                        "originalPoint": "0.0,0.0",
+                        "polygonPoints": [
+                            "-100.0,100.0",
+                            "100.0,0.0",
+                            "-100.0,-100.0",
+                            "-100.0,100.0"
+                        ],
+                        "rotation": "0.0",
+                        "smooth": "Smooth.None",
+                        "type": "Polygon",
+                        "visible": "true"
+                    }
+                ],
+                "type": "Transformation",
+                "visible": "true",
+                "visibleList": null
+            },
+            {
+                "classname": "Modelica.Blocks.Interfaces.RealInput",
+                "comment": "Connector of measurement input signal",
+                "connector_sizing": "",
+                "coordinate_system": {
+                    "extent1_diagram": [
+                        -100,
+                        -100
+                    ],
+                    "extent2_diagram": [
+                        100,
+                        100
+                    ],
+                    "preserve_aspect_ratio": true,
+                    "initial_scale": 0.2
+                },
+                "extend_name": "Modelica.Blocks.Interfaces.SVcontrol",
+                "extent1Diagram": "20.0,-20.0",
+                "extent2Diagram": "-20.0,20.0",
+                "graphType": "connector",
+                "inputOutputs": [],
+                "is_extend": true,
+                "mobility": false,
+                "name": "u_m",
+                "originDiagram": "0.0,-120.0",
+                "original_name": "u_m",
+                "output_type": "[]",
+                "parent": "PID",
+                "rotateAngle": "270.0",
+                "rotation": "270.0",
+                "subShapes": [
+                    {
+                        "color": "0,0,127",
+                        "fillColor": "0,0,127",
+                        "fillPattern": "FillPattern.Solid",
+                        "linePattern": "LinePattern.Solid",
+                        "lineThickness": "0.25",
+                        "originalPoint": "0.0,0.0",
+                        "polygonPoints": [
+                            "-100.0,100.0",
+                            "100.0,0.0",
+                            "-100.0,-100.0",
+                            "-100.0,100.0"
+                        ],
+                        "rotation": "0.0",
+                        "smooth": "Smooth.None",
+                        "type": "Polygon",
+                        "visible": "true"
+                    }
+                ],
+                "type": "Transformation",
+                "visible": "true",
+                "visibleList": null
+            },
+            {
+                "classname": "Modelica.Blocks.Interfaces.RealOutput",
+                "comment": "Connector of actuator output signal",
+                "connector_sizing": "",
+                "coordinate_system": {
+                    "extent1_diagram": [
+                        -100,
+                        -100
+                    ],
+                    "extent2_diagram": [
+                        100,
+                        100
+                    ],
+                    "preserve_aspect_ratio": true,
+                    "initial_scale": 0.1
+                },
+                "extend_name": "Modelica.Blocks.Interfaces.SVcontrol",
+                "extent1Diagram": "100.0,-10.0",
+                "extent2Diagram": "120.0,10.0",
+                "graphType": "connector",
+                "inputOutputs": [],
+                "is_extend": true,
+                "mobility": false,
+                "name": "y",
+                "originDiagram": "-,-",
+                "original_name": "y",
+                "output_type": "[]",
+                "parent": "PID",
+                "rotateAngle": "0",
+                "rotation": "0",
+                "subShapes": [
+                    {
+                        "color": "0,0,127",
+                        "fillColor": "255,255,255",
+                        "fillPattern": "FillPattern.Solid",
+                        "linePattern": "LinePattern.Solid",
+                        "lineThickness": "0.25",
+                        "originalPoint": "0.0,0.0",
+                        "polygonPoints": [
+                            "-100.0,100.0",
+                            "100.0,0.0",
+                            "-100.0,-100.0",
+                            "-100.0,100.0"
+                        ],
+                        "rotation": "0.0",
+                        "smooth": "Smooth.None",
+                        "type": "Polygon",
+                        "visible": "true"
+                    }
+                ],
+                "type": "Transformation",
+                "visible": "true",
+                "visibleList": null
+            },
+            {
+                "classname": "Modelica.Blocks.Interfaces.RealInput",
+                "comment": "Optional connector of feed-forward input signal",
+                "connector_sizing": "",
+                "coordinate_system": {
+                    "extent1_diagram": [
+                        -100,
+                        -100
+                    ],
+                    "extent2_diagram": [
+                        100,
+                        100
+                    ],
+                    "preserve_aspect_ratio": true,
+                    "initial_scale": 0.2
+                },
+                "extend_name": "Modelica.Blocks.Continuous.LimPID",
+                "extent1Diagram": "20.0,-20.0",
+                "extent2Diagram": "-20.0,20.0",
+                "graphType": "connector",
+                "inputOutputs": [],
+                "is_extend": true,
+                "mobility": false,
+                "name": "u_ff",
+                "originDiagram": "60.0,-120.0",
+                "original_name": "u_ff",
+                "output_type": "[]",
+                "parent": "PID",
+                "rotateAngle": "270.0",
+                "rotation": "270.0",
+                "subShapes": [
+                    {
+                        "color": "0,0,127",
+                        "fillColor": "0,0,127",
+                        "fillPattern": "FillPattern.Solid",
+                        "linePattern": "LinePattern.Solid",
+                        "lineThickness": "0.25",
+                        "originalPoint": "0.0,0.0",
+                        "polygonPoints": [
+                            "-100.0,100.0",
+                            "100.0,0.0",
+                            "-100.0,-100.0",
+                            "-100.0,100.0"
+                        ],
+                        "rotation": "0.0",
+                        "smooth": "Smooth.None",
+                        "type": "Polygon",
+                        "visible": "true"
+                    }
+                ],
+                "type": "Transformation",
+                "visible": "true",
+                "visibleList": null
+            }
+        ],
+        "is_extend": false,
+        "mobility": true,
+        "name": "PID",
+        "originDiagram": "-11.08924713134766,15.00974273681641",
+        "original_name": "PID",
+        "output_type": "[]",
+        "parent": "",
+        "rotateAngle": "0.0",
+        "rotation": "180",
+        "subShapes": [
+            {
+                "borderPattern": "BorderPattern.None",
+                "color": "0,0,127",
+                "extentsPoints": [
+                    "-100.0,-100.0",
+                    "100.0,100.0"
+                ],
+                "fillColor": "255,255,255",
+                "fillPattern": "FillPattern.Solid",
+                "linePattern": "LinePattern.Solid",
+                "lineThickness": "0.25",
+                "originalPoint": "0.0,0.0",
+                "radius": "0.0",
+                "rotation": "0.0",
+                "type": "Rectangle",
+                "visible": "true"
+            },
+            {
+                "color": "0,0,0",
+                "extentsPoints": [
+                    "-150.0,150.0",
+                    "150.0,110.0"
+                ],
+                "fillColor": "0,0,0",
+                "fillPattern": "FillPattern.None",
+                "fontName": "",
+                "fontSize": "0.0",
+                "horizontalAlignment": "TextAlignment.Center",
+                "linePattern": "LinePattern.Solid",
+                "lineThickness": "0.25",
+                "originalPoint": "0.0,0.0",
+                "originalTextString": "%name",
+                "rotation": "0.0",
+                "textColor": "0,0,255",
+                "textStyles": [],
+                "textType": "text",
+                "type": "Text",
+                "visible": "true"
+            },
+            {
+                "arrow": "Arrow.None,Arrow.None",
+                "arrowSize": "3.0",
+                "color": "192,192,192",
+                "linePattern": "LinePattern.Solid",
+                "lineThickness": "0.25",
+                "originalPoint": "0.0,0.0",
+                "points": [
+                    "-80.0,78.0",
+                    "-80.0,-90.0"
+                ],
+                "rotation": "0.0",
+                "smooth": "Smooth.None",
+                "type": "Line",
+                "visible": "true"
+            },
+            {
+                "color": "192,192,192",
+                "fillColor": "192,192,192",
+                "fillPattern": "FillPattern.Solid",
+                "linePattern": "LinePattern.Solid",
+                "lineThickness": "0.25",
+                "originalPoint": "0.0,0.0",
+                "polygonPoints": [
+                    "-80.0,90.0",
+                    "-88.0,68.0",
+                    "-72.0,68.0",
+                    "-80.0,90.0"
+                ],
+                "rotation": "0.0",
+                "smooth": "Smooth.None",
+                "type": "Polygon",
+                "visible": "true"
+            },
+            {
+                "arrow": "Arrow.None,Arrow.None",
+                "arrowSize": "3.0",
+                "color": "192,192,192",
+                "linePattern": "LinePattern.Solid",
+                "lineThickness": "0.25",
+                "originalPoint": "0.0,0.0",
+                "points": [
+                    "-90.0,-80.0",
+                    "82.0,-80.0"
+                ],
+                "rotation": "0.0",
+                "smooth": "Smooth.None",
+                "type": "Line",
+                "visible": "true"
+            },
+            {
+                "color": "192,192,192",
+                "fillColor": "192,192,192",
+                "fillPattern": "FillPattern.Solid",
+                "linePattern": "LinePattern.Solid",
+                "lineThickness": "0.25",
+                "originalPoint": "0.0,0.0",
+                "polygonPoints": [
+                    "90.0,-80.0",
+                    "68.0,-72.0",
+                    "68.0,-88.0",
+                    "90.0,-80.0"
+                ],
+                "rotation": "0.0",
+                "smooth": "Smooth.None",
+                "type": "Polygon",
+                "visible": "true"
+            },
+            {
+                "arrow": "Arrow.None,Arrow.None",
+                "arrowSize": "3.0",
+                "color": "0,0,127",
+                "linePattern": "LinePattern.Solid",
+                "lineThickness": "0.25",
+                "originalPoint": "0.0,0.0",
+                "points": [
+                    "-80.0,-80.0",
+                    "-80.0,-20.0",
+                    "30.0,60.0",
+                    "80.0,60.0"
+                ],
+                "rotation": "0.0",
+                "smooth": "Smooth.None",
+                "type": "Line",
+                "visible": "true"
+            },
+            {
+                "color": "0,0,0",
+                "extentsPoints": [
+                    "-20.0,-20.0",
+                    "80.0,-60.0"
+                ],
+                "fillColor": "0,0,0",
+                "fillPattern": "FillPattern.None",
+                "fontName": "",
+                "fontSize": "0.0",
+                "horizontalAlignment": "TextAlignment.Center",
+                "linePattern": "LinePattern.Solid",
+                "lineThickness": "0.25",
+                "originalPoint": "0.0,0.0",
+                "originalTextString": ".Modelica.Blocks.Types.SimpleController.PID",
+                "rotation": "0.0",
+                "textColor": "192,192,192",
+                "textStyles": [],
+                "textType": "text",
+                "type": "Text",
+                "visible": "true"
+            }
+        ],
+        "type": "Transformation",
+        "visible": "true",
+        "visibleList": null
+    }
+]

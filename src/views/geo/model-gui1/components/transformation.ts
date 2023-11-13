@@ -1,8 +1,6 @@
-import { ViewScale } from "./../../model-gui/enums/index";
 import type ShapeAnnotation from "../annotations/shape-annotation";
 import { ViewType } from "../enums";
 import type { Component } from "./component";
-import { Point } from "../model";
 
 export class Transformation {
   public width = 200;
@@ -34,7 +32,7 @@ export class Transformation {
 
   constructor(shape: ShapeAnnotation, component?: Component) {
     this.rawShape = shape;
-    this.shapeRotation = this.rawShape.rotation
+    this.shapeRotation = this.rawShape.rotation;
     if (component) {
       this.component = component;
       this.width = this.component.componentInfo.width;
@@ -62,22 +60,31 @@ export class Transformation {
   public getDiagramTransformationMatrix() {
     // 处理逻辑为先旋转 // 移动 // 缩放
     const transform = new Transform();
-    const componentInfo =  this.component!.componentInfo
-    const coordinateSystem = this.component!.coordinateSystem
-    const componentRotation = componentInfo.rotation
-    const componentCenter = coordinateSystem.getCenter()
-    const flipx = coordinateSystem.flipX
-    const flipy = coordinateSystem.flipY
-    const scaleOriginX = componentCenter.x
-    const scaleOriginY = componentCenter.y
-    transform.rotate(componentRotation, componentCenter.x, componentCenter.y)
-    if(this.rawShape.hasOriginPoint()) {
-      const shapeOriginPoint = this.rawShape.getViewOriginPoint()
-      transform.rotate(this.shapeRotation, shapeOriginPoint.x, shapeOriginPoint.y)
+    const componentInfo = this.component!.componentInfo;
+    const coordinateSystem = this.component!.coordinateSystem;
+    const componentRotation = componentInfo.rotation;
+    const componentCenter = coordinateSystem.getCenter();
+    const flipx = coordinateSystem.flipX;
+    const flipy = coordinateSystem.flipY;
+    const scaleOriginX = componentCenter.x;
+    const scaleOriginY = componentCenter.y;
+    transform.rotate(componentRotation, componentCenter.x, componentCenter.y);
+    transform.scale(flipx, flipy, scaleOriginX, scaleOriginY);
+    if (this.rawShape.hasOriginPoint()) {
+      const shapeOriginPoint = this.rawShape.getViewOriginPoint();
+      transform.rotate(
+        this.shapeRotation,
+        shapeOriginPoint.x,
+        shapeOriginPoint.y
+      );
     } else {
-      transform.rotate(this.shapeRotation, componentCenter.x, componentCenter.y)
+      transform.rotate(
+        this.shapeRotation,
+        componentCenter.x,
+        componentCenter.y
+      );
     }
-    transform.scale(flipx, flipy, scaleOriginX, scaleOriginY)
+
     return transform.toString();
   }
 
@@ -87,34 +94,24 @@ export class Transformation {
    */
   public getIconTransformationMatrix() {
     const transform = new Transform();
-    const componentInfo =  this.component!.componentInfo
-    const coordinateSystem = this.component!.coordinateSystem
-    const parentComponentInfo = this.component!.parentComponent!.componentInfo
-    const parentCooesinteSystem = this.component!.parentComponent!.coordinateSystem
-    const componentRotation = componentInfo.rotation
-    const parentCenter = parentComponentInfo.getViewCenter()
-    const sx = coordinateSystem.viewScaleX * parentCooesinteSystem.viewScaleX
-    const sy = coordinateSystem.viewScaleY * parentCooesinteSystem.viewScaleY
-    // const componentCenter = componentInfo.getViewCenter()
-    // const toDiagramCenter = {
-    //   x : componentCenter.x * coordinateSystem.viewScaleX * parentCooesinteSystem.viewScaleX,
-    //   y : componentCenter.y * coordinateSystem.viewScaleY * parentCooesinteSystem.viewScaleY,
-    // }
-    let componentCenter: Point
-    if(componentInfo.originDiagram.x && componentInfo.originDiagram.y) {
-      componentCenter = {
-        x: componentInfo.originDiagram.x * parentCooesinteSystem.viewScaleX,
-        y: componentInfo.originDiagram.y * parentCooesinteSystem.viewScaleY,
-      }
-    } else {
-      componentCenter = {
-        x: componentInfo.center.x * parentCooesinteSystem.viewScaleX,
-        y: componentInfo.center.y * parentCooesinteSystem.viewScaleY
-      }
-    }
-    // 父级组件旋转
-    transform.rotate(parentComponentInfo.rotation, parentCenter.x, parentCenter.y)
-    .rotate(componentInfo.rotation)
+    const componentInfo = this.component!.componentInfo;
+    const coordinateSystem = this.component!.coordinateSystem;
+    const parentCoordinateSystem =
+      this.component!.parentComponent!.coordinateSystem;
+    const { sx, sy, rotation } = this.reComputedIconFlip(
+      parentCoordinateSystem.flipX,
+      parentCoordinateSystem.flipY,
+      coordinateSystem.flipX,
+      coordinateSystem.flipY,
+      componentInfo.rotation
+    );
+    // 组件的自身旋转
+    transform.rotate(
+      rotation,
+      coordinateSystem.getCenter().x,
+      coordinateSystem.getCenter().y
+    );
+    transform.scale(sx, sy);
     return transform.toString();
   }
 
@@ -181,11 +178,16 @@ export class Transform {
 
   constructor() {}
 
-  public scale(sx: number, sy: number, originX?: number, originY?: number): Transform {
-    if(originX != undefined && originY !=undefined) {
-      this.transform.push(`translate(${originX},${originY})`)
+  public scale(
+    sx: number,
+    sy: number,
+    originX?: number,
+    originY?: number
+  ): Transform {
+    if (originX != undefined && originY != undefined) {
+      this.transform.push(`translate(${originX},${originY})`);
       this.transform.push(`scale(${sx},${sy})`);
-      this.transform.push(`translate(${-originX},${-originY})`)
+      this.transform.push(`translate(${-originX},${-originY})`);
     } else {
       this.transform.push(`scale(${sx},${sy})`);
     }
