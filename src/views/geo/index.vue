@@ -12,6 +12,8 @@ import Clock from "./clock.json";
 import Graphics from './graphic.json'
 import { Diagram } from "./model-gui1/components/diagram";
 import { ComponentEdge } from "./model-gui1/components/edge";
+import fluds from './fluid.json'
+
 const geogery = {
   classname: "Modelica.Clocked.ClockSignals.Interfaces.PartialPeriodicClock",
   comment: "",
@@ -3666,7 +3668,11 @@ onMounted(() => {
    const node =  new Diagram(graph, item).createNode()
    graph.addNode(node)
   }
-  for (const ge of components) {
+
+  Graphics[1].push(geogery, Clock)
+
+
+  for (const ge of Graphics[1]) {
     const parentComponent = new Component(graph, ge as any);
     const node = parentComponent.createNode();
     graph.addNode(node);
