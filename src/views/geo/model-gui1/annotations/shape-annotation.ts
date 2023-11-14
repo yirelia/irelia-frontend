@@ -9,7 +9,7 @@ import {
   toRgbColor,
 } from "../utils";
 import type { Component } from "../components/component";
-import { FillPattern, ViewScale, ViewType } from "../enums";
+import { Arrow, FillPattern, LinePattern, ViewScale, ViewType } from "../enums";
 
 const BigNumber = getBigNumerIntance();
 export default abstract class ShapeAnnotation {
@@ -18,7 +18,7 @@ export default abstract class ShapeAnnotation {
   public stroke = `rgb(0, 0, 0)`;
   public color = `rgb(0, 0, 0)`;
   public strokeWidth = 0.25;
-  public strokeDasharray = 0;
+  public strokeDasharray = "0";
   // 是否为平滑曲线
   public isSmooth = false;
   public radius = 0;
@@ -52,6 +52,13 @@ export default abstract class ShapeAnnotation {
   //
   public xlinkHref = "";
 
+  // 箭头类型
+  public arrowType = "";
+  // 开始箭头
+  public startArrow = Arrow.None;
+  // 结束箭头
+  public endArrow = Arrow.None;
+
   // 默认的缩放比例
   public viewScale = ViewScale;
   constructor(graph: Graph, shape: DiagramShape, component?: Component) {
@@ -61,6 +68,7 @@ export default abstract class ShapeAnnotation {
       this.component = component;
     }
     this.initShapePoints(this.rawShape);
+    this.setArrowType(this.rawShape.arrow);
     this.rotation = -toNum(shape.rotation);
     this.originalPoint = toPoint(shape.originalPoint);
     this.stroke = this.getStroke();
@@ -76,8 +84,7 @@ export default abstract class ShapeAnnotation {
         ? this.component?.componentInfo.name || ""
         : this.rawShape.originalTextString;
     this.isDiagram = this.rawShape.diagram || false;
-    this.strokeDasharray =
-      this.rawShape.linePattern !== "LinePattern.Solid" ? 5 : 0;
+    this.strokeDasharray = this.getStrokeDashArray(this.rawShape.linePattern);
     if (this.rawShape.imageBase64) {
       this.xlinkHref = `data:image/png;base64,${this.rawShape.imageBase64}`;
     }
@@ -100,6 +107,19 @@ export default abstract class ShapeAnnotation {
       points = shape.points;
     }
     this.extentPoints = points.map((item) => toPoint(item));
+  }
+
+  /**
+   * @description: 处理箭头类型
+   * @param {string} arrow
+   * @return {*}
+   */
+  public setArrowType(arrow: string): void {
+    if (arrow) {
+      const [startArrow, endArrow] = arrow.split(",") as Arrow[];
+      this.startArrow = startArrow;
+      this.endArrow = endArrow;
+    }
   }
 
   /**
@@ -353,5 +373,26 @@ export default abstract class ShapeAnnotation {
       x: new BigNumber(shapeOriginX).multipliedBy(viewScaleX).toNumber(),
       y: new BigNumber(shapeOriginY).multipliedBy(viewScaleY).toNumber(),
     };
+  }
+
+  /**
+   * @description: 获取线段patter
+   * @param {string} linePattern
+   * @return {*}
+   */
+  public getStrokeDashArray(linePattern: string): string {
+    switch (linePattern) {
+      case LinePattern.Solid:
+      case LinePattern.None:
+        return "0";
+      case LinePattern.Dash:
+      case LinePattern.DashDot:
+      case LinePattern.DashDotDot:
+      case LinePattern.Dot:
+        return "5";
+      default:
+        // never reached
+        return "0";
+    }
   }
 }

@@ -2,12 +2,14 @@
  * @Author: yangrui 17368465776@163.com
  * @Date: 2023-07-02 14:35:04
  * @LastEditors: simtek/yangrui 17368465776@163.com
- * @LastEditTime: 2023-11-10 18:13:23
+ * @LastEditTime: 2023-11-14 11:07:20
  * @FilePath: /yssim-frontend-vue3/src/views/svg/model-gui/enums/index.ts
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
 
 export * from "./pattern";
+export * from "./arrow";
+export * from "./line";
 export enum GraphDataTagEnum {
   DiagramEdge = "edge",
   DiagramComponent = "Component",

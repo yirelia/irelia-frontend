@@ -68,6 +68,11 @@ export class Diagram {
   public createNode() {
     const markup = this.getMarkUp();
     const { zIndex } = this;
+    if (this.rawShape.star) {
+    }
+    if (this.rawShape.type === "Line") {
+      // return this.graph.createEdge();
+    }
     // 此处坐标系就是原点，不需要移动
     return {
       zIndex: zIndex,

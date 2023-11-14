@@ -1,5 +1,5 @@
 import { ComponentInfo } from "./component-info";
-import type { Graph } from "@antv/x6";
+import type { Graph, Markup } from "@antv/x6";
 import type { DiagramComponent } from "../model";
 import { GraphDataTagEnum, ShapeLayer, ViewScale, ViewType } from "../enums";
 import {
@@ -55,7 +55,7 @@ export class Component {
     this.coordinateSystem.setViewScaleY(viewSy);
   }
 
-  public getMarkUp() {
+  public getMarkUp(): Markup {
     const shapeList = [];
     for (const shape of this.componentInfo.getSubShape()) {
       if (shape.type === "Rectangle") {
@@ -72,7 +72,7 @@ export class Component {
         shapeList.push(new BitmapAnnotation(this.graph, shape, this));
       }
     }
-    return shapeList.map((item) => item.markup());
+    return shapeList.map((item) => item.markup()) as unknown as Markup;
   }
 
   public get rawComponentInfo() {
