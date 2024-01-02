@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-upload action="#" :before-upload="handleChange">
+    <el-upload action="#" :on-change="handleChange" >
       <el-button>上传文件</el-button>
     </el-upload>
   </div>
@@ -9,9 +9,13 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { Graph, Node as XNode } from "@antv/x6";
+import { LogicalStructure } from "./logical";
+import { UploadFile } from "element-plus";
 
 const domRef = ref();
 const graph = ref<Graph>();
+
+const  logicalInstan  = ref<LogicalStructure>()
 const initGraph = () => {
   if (!graph.value) {
     graph.value = new Graph({
@@ -27,104 +31,86 @@ const initGraph = () => {
       },
     });
   }
+  logicalInstan.value = new LogicalStructure(graph.value)
+  graph.value?.addNode({
+    zIndex: 9999,
+    markup: [
+      {
+        tagName: 'path',
+        attrs: {
+          d : 'M-100 0, L100, 0',
+          stroke: 'red'
+        }
+      },
+      {
+        tagName: 'path',
+        attrs: {
+          d : 'M0,-100 L0,100',
+          stroke: 'red'
+        }
+      }
+    ]
+  })
+
+  graph.value?.addNode({
+    width: 100, 
+    height: 100,
+  })
+
+  graph.value?.addNode({
+    x: 10,
+    y: 10,
+    width: 100, 
+    height: 100,
+    attrs: {
+      body: {
+        stroke: 'red',
+        
+      }
+    }
+  })
+
+
+  graph.value.centerContent()
+
+
+
 };
 
 onMounted(() => {
   initGraph();
 });
-const handleChange = (uploadFile: File) => {
+const handleChange = async (uploadFile: UploadFile) => {
   graph.value?.clearCells();
-  const reader = new FileReader();
-  reader.readAsText(uploadFile);
-  const nodeMap = new Map<string, XNode>();
-  reader.onloadend = function () {
-    const dom = new DOMParser().parseFromString(
-      reader.result as string,
-      "text/xml"
-    );
-
-    const logicalReferences =
-      dom.getElementsByTagName("LogicalReference")[0].children;
-    const nodes = [];
-
-    for (const lrchild of logicalReferences) {
-      const boundingBoxEl = lrchild.querySelector("BoundingBox")!;
-      const V_NameEl = lrchild.querySelector("V_Name");
-      const XMin = boundingBoxEl.getAttribute("XMin");
-      const YMin = boundingBoxEl.getAttribute("YMin");
-      const XMax = boundingBoxEl.getAttribute("XMax");
-      const YMax = boundingBoxEl.getAttribute("YMax");
-      const width = Number(XMax) - Number(XMin);
-      const height = Number(YMax) - Number(YMin);
-      const x = Number(XMin);
-      const y = Number(YMin);
-      const label = V_NameEl?.textContent;
-      const id = lrchild.getAttribute("Value")!;
-      // nodes.push({
-      //   id,
-      //   x,
-      //   y: -y,
-      //   width,
-      //   height,
-      //   label,
-      //   attrs: {},
-      // });
-      const parentNode = {
-        id,
-        x,
-        y: -y,
-        width,
-        height,
-        label: `${id} ${label} ,
-                x: ${x} y:${y} 
-                width: ${width} height: ${height}
-                `,
-        attrs: {},
-      };
-
-      nodeMap.set(id, graph.value?.addNode(parentNode)!);
-    }
-    // graph.value?.addNodes(nodes);
-    // const instanceNodes = [];
-    // LogicalInstance
-    const logicalInstanceEl =
-      dom.getElementsByTagName("LogicalInstance")[0].children;
-
-    for (const lrchild of logicalInstanceEl) {
-      const boundingBoxEl = lrchild.querySelector("BoundingBox")!;
-      const PLM_ExternalIDEl = lrchild.querySelector("PLM_ExternalID");
-      const RelationEl = lrchild.querySelector("Relation");
-      const OwnerReferenceId = RelationEl?.getAttribute("OwnerReference")!;
-      const parnetId = RelationEl?.getAttribute("Reference")!;
-      const XMin = boundingBoxEl.getAttribute("XMin");
-      const YMin = boundingBoxEl.getAttribute("YMin");
-      const XMax = boundingBoxEl.getAttribute("XMax");
-      const YMax = boundingBoxEl.getAttribute("YMax");
-
-      const width = Number(XMax) - Number(XMin);
-      const height = Number(YMax) - Number(YMin);
-      const x = Number(XMin);
-      const y = Number(YMin);
-      const label = PLM_ExternalIDEl?.textContent;
-      const instanceNode = {
-        x,
-        y: -y,
-        width,
-        height,
-        label: `Reference:${parnetId} OwnerReferenceId:${OwnerReferenceId} ${label}`,
+  logicalInstan.value?.clear()
+  await logicalInstan.value!.loadXml(uploadFile.raw!)
+  graph.value?.addNode({
+    zIndex: 9999,
+    markup: [
+      {
+        tagName: 'path',
         attrs: {
-          body: {
-            stroke: "red",
-            strokeWidth: 1,
-          },
-        },
-      };
-      // instanceNodes.push();
-      const gNode = graph.value?.addNode(instanceNode)!;
-      nodeMap.get(parnetId)?.addChild(gNode);
-    }
-    // graph.value?.addNodes(instanceNodes);
-  };
+          d : 'M-100 0, L100, 0',
+          stroke: 'red'
+        }
+      },
+      {
+        tagName: 'path',
+        attrs: {
+          d : 'M0,-100 L0,100',
+          stroke: 'red'
+        }
+      }
+    ]
+  })
+
+  graph.value?.addNode({
+    width: 100, 
+    height: 100,
+  })
+
+
+  graph.value!.centerContent()
 };
 </script>
 <style lang="scss">
