@@ -4,7 +4,13 @@
       <el-button>上传文件</el-button>
     </el-upload>
   </div>
-  <div ref="domRef" class="canvas-svg"></div>
+  <div class="model-graph-wrap">
+    <div class="model-tree">
+      <el-tree :data="treeData" :props="treeProps"></el-tree>
+    </div>
+    <div ref="domRef" class="canvas-svg"></div>
+  </div>
+  
 </template>
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
@@ -14,6 +20,12 @@ import { UploadFile } from "element-plus";
 
 const domRef = ref();
 const graph = ref<Graph>();
+const treeData = ref([])
+const treeProps = {
+  label(data) {
+    return `${data.VName || data.mandatory.PLM_ExternalID}_${data.id}`
+  }
+}
 
 const  logicalInstan  = ref<LogicalStructure>()
 const initGraph = () => {
@@ -52,25 +64,6 @@ const initGraph = () => {
     ]
   })
 
-  graph.value?.addNode({
-    width: 100, 
-    height: 100,
-  })
-
-  graph.value?.addNode({
-    x: 10,
-    y: 10,
-    width: 100, 
-    height: 100,
-    attrs: {
-      body: {
-        stroke: 'red',
-        
-      }
-    }
-  })
-
-
   graph.value.centerContent()
 
 
@@ -103,19 +96,21 @@ const handleChange = async (uploadFile: UploadFile) => {
       }
     ]
   })
-
-  graph.value?.addNode({
-    width: 100, 
-    height: 100,
-  })
-
-
+  treeData.value = logicalInstan.value!.transform2Tree()
   graph.value!.centerContent()
 };
 </script>
 <style lang="scss">
 .canvas-svg {
-  width: 100%;
+ flex: 1;
+}
+.model-graph-wrap {
+  display: flex;
   height: 100%;
+  width: 100%;
+}
+.model-tree {
+  width: 400px;
+
 }
 </style>
