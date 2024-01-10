@@ -1,7 +1,6 @@
 import { convertMMToPixel } from "@/utils";
 import { Graph } from "@antv/x6";
-import { toRaw } from "vue";
-
+import { BoundingBox, Box, LogicalReference, Mandatory } from "./model";
 const dpi = {
   v: 0,
   get: function (noCache: boolean) {
@@ -15,6 +14,8 @@ const dpi = {
     return dpi.v;
   },
 };
+
+import { XMLParser } from "fast-xml-parser";
 
 const screenDPI = dpi.get(true); // 重新计算DPI
 
@@ -90,37 +91,7 @@ Graph.registerNode(
   true
 );
 
-interface Box {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
 
-interface BoundingBox {
-  XMin: number;
-  YMin: number;
-  XMax: number;
-  YMax: number;
-}
-interface Mandatory {
-  PLM_ExternalID: string;
-  V_Identifier?: string;
-  V_Direction?: string;
-  relation?: {
-    ownerReference: string;
-    reference: string;
-  };
-  BoundingBox: BoundingBox;
-}
-interface LogicalReference {
-  id: string;
-  mandatory: Mandatory;
-  VName: string;
-  children?: LogicalReference[];
-  type: string;
-  logicalReference?: LogicalReference;
-}
 
 interface Intance extends LogicalReference {
   PLM_ExternalID: string;
@@ -128,13 +99,27 @@ interface Intance extends LogicalReference {
 
 const DPI = 96;
 export class LogicalStructure {
-  private logicals: LogicalReference[] = [];
-  public instances: LogicalReference[] = [];
-  public logicalMap: Record<string, LogicalReference> = {};
-  private instanceMap: Record<string, LogicalReference> = {};
   private graph: Graph;
+  public logicalData: LogicalReference[] = [];
+  // 逻辑架构抽象接口
+  private logicals: LogicalReference[] = [];
+  public logicalMap: Record<string, LogicalReference> = {};
 
-  public logicalData = [];
+  // 逻辑架构实例
+  public instances: LogicalReference[] = [];
+  private instanceMap: Record<string, LogicalReference> = {};
+
+
+  // 逻辑流参考
+  public logicalFlow: LogicalReference[] = []
+  public logicalFlowMap: Record<string, LogicalReference> = {};
+
+  public  flowInstances: LogicalReference[] = []
+
+  public flowInstanceMap:  Record<string, LogicalReference> = {};
+
+
+
 
   constructor(graph: Graph) {
     this.graph = graph;
@@ -166,16 +151,19 @@ export class LogicalStructure {
   }
 
   public parseXml(xmlString: string) {
-    const dom = new DOMParser().parseFromString(xmlString, "text/xml");
 
-    const logicalReferences: Element[] = (dom.querySelector("LogicalReference")
-      ?.children || []) as Element[];
-    this.parseLogicalReference(logicalReferences);
-    const logicalInstances = (dom.querySelector("LogicalInstance")?.children ||
-      []) as Element[];
-    this.parseLogicalReference(logicalInstances, true);
-    this.logicalData = this.transform2Tree();
-    this.drawFramework(this.rootLogicId);
+    const xmlParser = new XMLParser()
+    console.log(xmlParser.parse(xmlString))
+    const RFLP = xmlParser.parse(xmlString).RFLP
+  //   const dom = new DOMParser().parseFromString(xmlString, "text/xml");
+  //   const logicalReferences: Element[] = (dom.querySelector("LogicalReference")
+  //     ?.children || []) as Element[];
+  //   this.parseLogicalReference(logicalReferences);
+  //   const logicalInstances = (dom.querySelector("LogicalInstance")?.children ||
+  //     []) as Element[];
+  //   this.parseLogicalReference(logicalInstances, true);
+  //   this.logicalData = this.transform2Tree();
+  //   this.drawFramework(this.rootLogicId);
   }
 
   public parseLogicalReference(
@@ -213,10 +201,10 @@ export class LogicalStructure {
 
   public parseMandatory(referenceDom: Element): Mandatory {
     const boundingBoxEl = referenceDom.querySelector("BoundingBox")!;
-    let XMin = boundingBoxEl.getAttribute("XMin");
-    let YMin = boundingBoxEl.getAttribute("YMin");
-    let XMax = boundingBoxEl.getAttribute("XMax");
-    let YMax = boundingBoxEl.getAttribute("YMax");
+    let XMin = boundingBoxEl?.getAttribute("XMin") || 0;
+    let YMin = boundingBoxEl?.getAttribute("YMin") || 0;
+    let XMax = boundingBoxEl?.getAttribute("XMax") || 0;
+    let YMax = boundingBoxEl?.getAttribute("YMax") || 0;
     const releationEl = referenceDom.querySelector("Relation");
     const ownerReference = releationEl?.getAttribute("OwnerReference") || "";
     const reference = releationEl?.getAttribute("Reference") || "";
@@ -236,6 +224,8 @@ export class LogicalStructure {
       },
     };
   }
+
+  public parseFlowMandatory() {}
 
   public parseReferenceType(referenceDom: Element): string {
     return referenceDom.getAttribute("Type")!;
@@ -271,7 +261,41 @@ export class LogicalStructure {
    * @description:
    * @return {*}
    */
-  public parseLogicalFlowReference() {}
+  public parseLogicalFlowReference(doc:Document) {
+    const logicalFlowReference: Element[] = (doc.querySelector("LogicalFlowReference")
+      ?.children || []) as Element[];
+      for (const lrchild of logicalFlowReference) {
+        const mandatory = this.parseMandatory(lrchild);
+        // 解析 ID
+        const id = lrchild.getAttribute("Value")!;
+        const V_NameEl = lrchild.querySelector("V_Name");
+        const VName = (V_NameEl?.textContent as string) || "";
+        const type = this.parseReferenceType(lrchild);
+        // 记录第一个rootId
+        if (!this.rootLogicId) {
+          this.rootLogicId = id;
+        }
+  
+        const refrence: LogicalReference = {
+          id,
+          mandatory,
+          VName,
+          type,
+        };
+        // 此处将架构对象挂在到实例上
+        if (isInstance) {
+          this.instances.push(refrence);
+          this.instanceMap[id] = refrence;
+          // refrence.logicalReference = this.referenceMap[mandatory.relation!.reference]
+        } else {
+          this.logicals.push(refrence);
+          this.logicalMap[id] = refrence;
+        }
+      }
+    
+  }
+
+  public parse
 
   /**
    * @description: 解析连线
@@ -299,13 +323,12 @@ export class LogicalStructure {
 
   }
 
-  public drawChildFramework(rootId: string, rootBox, level = 0 ) {
+  public drawChildFramework(rootId: string, rootBox: Box, level = 0 ) {
     const childInstances =
     rootId === this.rootLogicId
       ? this.logicalData[0].children
       : this.instanceMap[rootId].children || [];
 
-    let box
     for (const instanceItem of childInstances) {
       const instanceBox = this.getRectBox(instanceItem.mandatory.BoundingBox);
       if (level === 0) {
@@ -345,52 +368,13 @@ export class LogicalStructure {
             },
             label: instanceItem.mandatory.PLM_ExternalID,
         });
-        box = {
+        const parentBox = {
             x,y, width, height
         }
-        this.drawChildFramework(instanceItem.id, box ,level + 1)
+        this.drawChildFramework(instanceItem.id, parentBox ,level + 1)
       }
       
     }
-  }
-
-  public drawChildInstance(
-    instanceReferences: LogicalReference[],
-    ownerLogicalBox: Box,
-    sx: number,
-    sy: number,
-    ownerInstanceLogicalBox: Box
-  ) {
-    for (const instanceReference of instanceReferences) {
-      const viewBox = this.getRectBox(instanceReference.mandatory.BoundingBox);
-      const x =
-        sx * (viewBox.x - ownerLogicalBox.x) + ownerInstanceLogicalBox.x;
-      const y =
-        sy * (viewBox.y - ownerLogicalBox.y) + ownerInstanceLogicalBox.y;
-      const width = viewBox.width * sx;
-      const height = viewBox.height * sy;
-      this.graph.addNode({
-        id: instanceReference.id,
-        x,
-        y,
-        width,
-        height,
-        attrs: {
-          body: {
-            stroke: "red",
-          },
-        },
-      });
-    }
-  }
-
-  public getLogicalInstances(ownerReference: string) {
-    return this.references.filter((item) => {
-      return (
-        item.type === "RFLVPMLogicalInstance" &&
-        item.mandatory.relation?.ownerReference === ownerReference
-      );
-    });
   }
 
   public getRectBox(boundingBox: BoundingBox) {
@@ -401,6 +385,7 @@ export class LogicalStructure {
       height: Math.abs(boundingBox.YMax - boundingBox.YMin),
     };
   }
+
 
   public getCenter(boundingBox: BoundingBox) {
     return {
