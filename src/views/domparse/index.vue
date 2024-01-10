@@ -1,12 +1,12 @@
 <template>
   <div>
-    <el-upload action="#" :on-change="handleChange" >
+    <el-upload :before-upload="handleChange" >
       <el-button>上传文件</el-button>
     </el-upload>
   </div>
   <div class="model-graph-wrap">
     <div class="model-tree">
-      <el-tree :data="treeData" :props="treeProps"></el-tree>
+      <el-tree :data="treeData" :props="treeProps" @node-click="handleNodeClick" ></el-tree>
     </div>
     <div ref="domRef" class="canvas-svg"></div>
   </div>
@@ -16,7 +16,7 @@
 import { onMounted, ref } from "vue";
 import { Graph, Node as XNode } from "@antv/x6";
 import { LogicalStructure } from "./logical";
-import { UploadFile } from "element-plus";
+import { UploadFile, UploadRawFile } from "element-plus";
 
 const domRef = ref();
 const graph = ref<Graph>();
@@ -73,10 +73,10 @@ const initGraph = () => {
 onMounted(() => {
   initGraph();
 });
-const handleChange = async (uploadFile: UploadFile) => {
+const handleChange = async (uploadFile: UploadRawFile) => {
   graph.value?.clearCells();
   logicalInstan.value?.clear()
-  await logicalInstan.value!.loadXml(uploadFile.raw!)
+  await logicalInstan.value!.loadXml(uploadFile)
   graph.value?.addNode({
     zIndex: 9999,
     markup: [
@@ -96,9 +96,16 @@ const handleChange = async (uploadFile: UploadFile) => {
       }
     ]
   })
-  treeData.value = logicalInstan.value!.transform2Tree()
+  treeData.value = logicalInstan.value?.logicalData
   graph.value!.centerContent()
+  return true
 };
+
+const handleNodeClick = (data)=>  {
+  graph.value?.clearCells()
+  logicalInstan.value?.drawFramework(data.id)
+  graph.value!.centerContent()
+}
 </script>
 <style lang="scss">
 .canvas-svg {
