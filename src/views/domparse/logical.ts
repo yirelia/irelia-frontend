@@ -1,6 +1,6 @@
 
 import { Graph } from "@antv/x6";
-import { BoundingBoxAttrs, Box, RFLP, RFLPItem } from "./model";
+import { BoundingBoxAttrs, Box, PositionSize, RFLP, RFLPItem } from "./model";
 import { X2jOptions, XMLParser } from "fast-xml-parser";
 import { camelCase } from "lodash-es";
 import { label } from "three/examples/jsm/nodes/Nodes.js";
@@ -156,8 +156,18 @@ export class LogicalStructure {
         // 预处理坐标值
         const reg = /mandatory.boundingBox$/
         if (reg.test(jPath)) {
-          return (name === 'YMin' || name === 'YMax') ? -Number(val) : Number(val)
+          const numVal = (name === 'YMin' || name === 'YMax') ? -Number(val) : Number(val)
+          return numVal * 4
         }
+        // 处理size 大小
+        if(jPath === 'rflp.logicalFlowExpositionInstance.id.mandatory.positionSize') {
+          if(['x', 'y'].includes(name)) {
+            return Number(val) * 4 
+          }
+          return name === 'size' ?  Number(val) * 4 : val
+        }
+        // const portPositionSize
+        if(reg.test(jPath)) {}
         return val
       },
       transformTagName: (tagName) => camelCase(tagName),
@@ -171,14 +181,15 @@ export class LogicalStructure {
     this.parseLogicalReference(parseResult)
     this.parseLogicalInstance(parseResult)
     this.parseLogicalFlowExpositionInstance(parseResult)
+    this.parsePorts(parseResult)
     this.treeData = this.array2Tree()
     this.drawFramework(this.rootLogicId);
   }
 
-
   public parseLogicalReference(parseResult: RFLP) {
     this.logicalReferenceList = parseResult.logicalReference.id.map((item) => {
       item.children = []
+      item.ports = []
       item.id = item.attrs.value
       item.rawrefrence = null
       // 同时存储map方便获取
@@ -194,6 +205,7 @@ export class LogicalStructure {
   public parseLogicalInstance(parseResult: RFLP) {
     this.logicalInstanceList = parseResult.logicalInstance.id.map(item => {
       item.children = []
+      item.ports = []
       item.id = item.attrs.value
       item.rawrefrence = null
       // 存储方便处理
@@ -214,8 +226,23 @@ export class LogicalStructure {
     })
   }
 
+  public parsePorts(parseResult: RFLP) {
+    this.logicalFEInstanceList = parseResult.logicalFlowExpositionInstance.id.map(item => {
+      item.id = item.attrs.value
+      item.label = item.mandatory.plmExternalId.$text
+      return item
+    })
+   for(const item of this.logicalFEInstanceList) {
+    this.logicalFEInstanceMap[item.id] = item
+    const {instanceId} = item.mandatory.positionSize![1].attrs
+    const instance =  this.logicalInstanceMap[instanceId]
+    instance.ports.push(item)
+    const ownerReference = item.mandatory.relation.attrs.ownerReference
+    const logical = this.logicalReferenceMap[ownerReference]
+    logical.ports.push(item)
+   }
 
-
+  }
 
   /**
    * @description: 解析为树状结构
@@ -247,6 +274,7 @@ export class LogicalStructure {
   public drawFramework(rootId: string) {
     const logical = this.logicalReferenceMap[rootId] || this.logicalInstanceMap[rootId].rawrefrence
     const rootBox = this.transform2RectBox(logical.mandatory.boundingBox.attrs);
+    const boundingBox = logical.mandatory.boundingBox.attrs
     this.graph.addNode({
       id: logical.id,
       x: rootBox.x,
@@ -255,6 +283,29 @@ export class LogicalStructure {
       height: rootBox.height,
       label: logical.vName.$text,
     });
+    if(logical.ports.length) {
+      for(const port of logical.ports) {
+        // TODO  抽取公共放饭
+        const {x: sx, y: sy, size} = port.mandatory.positionSize![0].attrs
+        const lx = boundingBox.xMin + rootBox.width * Number(sx)
+        const ly = boundingBox.yMin - rootBox.height * Number(sy)
+        const y = ly - Number(size) * 4
+        const width = Number(size) * 4
+        const height = Number(size) * 4
+        this.graph.addNode({
+          id: port.id,
+          x:lx,
+          y,
+          width,
+          height,
+          attrs: {
+            body: {
+              stroke: 'green'
+            }
+          }
+        })
+      }
+    }
     this.drawChildFramework(rootId, rootBox)
 
   }
@@ -318,16 +369,51 @@ export class LogicalStructure {
   }
 
   public transform2RectBox(boundingBox: BoundingBoxAttrs) {
-    const scale = 4
     return {
-      x: boundingBox.xMin * scale,
-      y: boundingBox.yMax * scale,
-      width: Math.abs(boundingBox.xMax - boundingBox.xMin) *scale,
-      height: Math.abs(boundingBox.yMax - boundingBox.yMin) * scale,
+      x: boundingBox.xMin,
+      y: boundingBox.yMax,
+      width: Math.abs(boundingBox.xMax - boundingBox.xMin),
+      height: Math.abs(boundingBox.yMax - boundingBox.yMin),
     };
   }
 
   public getTreeData() {
     return this.treeData
+  }
+
+  /**
+   * @description: 计算port位置
+   * @param {Box} coordinateBox
+   * @param {PositionSize} portPosition
+   * @return {*}
+   */  
+  public computPortBox(coordinateBox: Box, portPosition: PositionSize) {
+    const originX = coordinateBox.x
+    const originY = coordinateBox.y - coordinateBox.height
+    const {x: sx, y: sy,size} = portPosition.attrs
+    const  portLbx = originX + coordinateBox.width * sx
+    const  portLby = originY - coordinateBox.height * sy
+    if(sx === 0) {
+      return {
+        x: portLbx - size,
+        y: portLby - size,
+        width: size,
+        height: size
+      }
+    }
+    if(sy === 0) {
+      return {
+        x: portLbx,
+        y: portLby - size,
+        width: size,
+        height: size
+      }
+    }
+    return  {
+      x: portLbx,
+      y: portLby,
+      width: size,
+      height: size,
+    }
   }
 }

@@ -7,12 +7,11 @@ export interface Box {
   height: number;
 }
 
-
 interface Attrs {
-  [index: string]: any
+  [index: string]: any;
 }
 
-export interface BoundingBoxAttrs  extends Attrs {
+export interface BoundingBoxAttrs extends Attrs {
   xMin: number;
   yMin: number;
   xMax: number;
@@ -20,20 +19,29 @@ export interface BoundingBoxAttrs  extends Attrs {
 }
 
 export interface TagAttrs extends Attrs {
-  type: string
+  type: string;
 }
 
 export interface ReferenceAttrs extends Attrs {
-  value: string,
-  type: string
+  value: string;
+  type: string;
 }
 export interface RelationAttrs extends Attrs {
-  ownerReference: string,
-  reference: string
+  ownerReference: string;
+  reference: string;
+}
+
+export interface PositionSize {
+  attrs: {
+    instanceId: string;
+    x:  number;
+    y:  number;
+    size: number;
+  };
 }
 
 export interface RFLPItem {
-  id: string,
+  id: string;
   mandatory: {
     plmExternalId: {
       $text: string;
@@ -42,19 +50,20 @@ export interface RFLPItem {
       };
     };
     boundingBox: {
-      attrs: BoundingBoxAttrs
-    },
+      attrs: BoundingBoxAttrs;
+    };
     relation: {
-      attrs: RelationAttrs
-    }
+      attrs: RelationAttrs;
+    };
+    positionSize?: PositionSize[];
   };
   vName: {
     $text: string;
-    attrs: TagAttrs
+    attrs: TagAttrs;
   };
   revision: {
     $text: "A";
-    attrs: TagAttrs
+    attrs: TagAttrs;
   };
   originated: {
     $text: "10/04/22 :: 06:10:10 下午";
@@ -71,13 +80,13 @@ export interface RFLPItem {
   modified: {
     $text: string;
     attrs: {
-      type:string;
+      type: string;
     };
   };
   current: {
     $text: string;
     attrs: {
-      type: string
+      type: string;
     };
   };
   owner: {
@@ -107,15 +116,14 @@ export interface RFLPItem {
   textGraphicProperties: {
     displayName: "TRUE";
   };
-  label: string,
-  attrs: ReferenceAttrs,
-  children: RFLPItem[],
-  rawrefrence: RFLPItem | null
-
+  label: string;
+  attrs: ReferenceAttrs;
+  children: RFLPItem[];
+  rawrefrence: RFLPItem | null;
+  ports: RFLPItem[];
 }
 
 export enum LogicalType {}
-
 
 export interface Mandatory {}
 
@@ -133,7 +141,6 @@ export interface RFLP {
     id: RFLPItem[];
   };
 }
-
 
 // export interface LogicalReference {
 //   id: string, // 类型
