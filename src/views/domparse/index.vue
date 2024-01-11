@@ -22,9 +22,6 @@ const domRef = ref();
 const graph = ref<Graph>();
 const treeData = ref([])
 const treeProps = {
-  label(data) {
-    return `${data.VName || data.mandatory.PLM_ExternalID}_${data.id}`
-  }
 }
 
 const  logicalInstan  = ref<LogicalStructure>()
@@ -96,7 +93,7 @@ const handleChange = async (uploadFile: UploadRawFile) => {
       }
     ]
   })
-  treeData.value = logicalInstan.value?.logicalData
+  treeData.value = logicalInstan.value?.getTreeData()
   graph.value!.centerContent()
   return true
 };
