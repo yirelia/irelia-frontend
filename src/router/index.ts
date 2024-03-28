@@ -52,6 +52,13 @@ export const routes = [
       name: "关键能力图谱",
     },
   },
+  {
+    path: "/loop",
+    component: () => import("@/views/loop/index.vue"),
+    meta: {
+      name: "for循环性能优化",
+    },
+  },
 ];
 const router = createRouter({
   history: createWebHistory(),
