@@ -59,6 +59,13 @@ export const routes = [
       name: "for循环性能优化",
     },
   },
+  {
+    path: "/graph",
+    component: () => import("@/views/graph/index.vue"),
+    meta: {
+      name: "图数据",
+    },
+  },
 ];
 const router = createRouter({
   history: createWebHistory(),
