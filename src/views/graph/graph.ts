@@ -1,7 +1,7 @@
 import { Bag } from "./data/bag";
 import { DepthFirstSearch } from "./depth-first-search";
 import tinyG from './files/tinyG.txt?raw'
-
+import tinyCG from './files/tinyCG.txt?raw'
 export class Graph {
   public V: number;
   public E: number;
@@ -18,7 +18,7 @@ export class Graph {
  
   private validateVertex(v: number): void {
     if (v < 0 || v >= this.V)
-        throw new Error("vertex " + v + " is not between 0 and " + (V-1));
+        throw new Error("vertex " + v + " is not between 0 and " + `${this.V - 1}`);
 }
 
   public addEdge(v: number, w: number): void {
@@ -54,7 +54,7 @@ export class Graph {
 
 
 export function readTinyG() {
-  const tinyGList = tinyG.split('\n')
+  const tinyGList = tinyCG.split('\n')
   const v  = parseInt(tinyGList[0], 10)
   // const e = parseInt(tinyGList[1], 10)
 

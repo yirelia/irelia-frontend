@@ -36,6 +36,16 @@ export class Bag<T> {
   public getNode() {
     return this.head
   }
+
+  public getNodes() {
+    const nodes: number[] = []
+    let head = this.head
+    while(head) {
+      nodes.push(head!.val)
+      head = head!.next
+    }
+    return nodes
+  }
 }
 
 class Node<T extends any = any> {
