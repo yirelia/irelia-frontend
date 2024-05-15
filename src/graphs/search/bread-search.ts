@@ -1,6 +1,4 @@
-import path from "path"
-import { Graph, readTinyG } from "../graph"
-import { put } from "node_modules/axios/index.d.cts"
+import { Graph } from "../graph"
 
 export class BreadFirstPaths {
     
@@ -51,14 +49,4 @@ export class BreadFirstPaths {
 
     }
 
-}
-
-export function bfsSearch() {
-   const graph =  readTinyG()
-   const search = new BreadFirstPaths(graph, 0)
-    console.log(search)
-   for(let i = 0; i < graph.V; i++) {
-    const paths = search.pathTo(i)
-    console.log(`${search.s} to ${i} : ${paths?.join('-')}`)
-   }
 }

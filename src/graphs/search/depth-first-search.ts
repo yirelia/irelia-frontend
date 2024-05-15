@@ -1,4 +1,4 @@
-import { Graph } from "./graph"
+import { Graph } from "../graph"
 
 export class DepthFirstSearch {
     public marked: boolean[]
@@ -6,9 +6,8 @@ export class DepthFirstSearch {
 
     constructor(graph: Graph, s: number) {
         this.marked = []
-        for(let i = 0; i < graph.V; i++) {
-            this.marked.push(false)
-        }
+        this.count = 0
+        this.marked = Array.from({length: graph.V}, () => false)
         this.dfs(graph, s)
     }
 

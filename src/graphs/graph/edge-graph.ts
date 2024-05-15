@@ -1,4 +1,4 @@
-import { Bag } from "../data/bag";
+import { Bag } from "../data-struct/bag";
 import tinyEWG from './tinyEWG.txt?raw'
 
 export class EdgeWeightedGraph {

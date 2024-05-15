@@ -8,7 +8,7 @@
 <script setup lang="ts">
 import * as THREE from "three";
 // import { EditorControls } from "./plane/EditorControls.ts";
-import { onMounted, ref, render } from "vue";
+import { onMounted, ref } from "vue";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 // import { TransformControls } from "three/addons/controls/TransformControls.js";
 import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
@@ -16,7 +16,6 @@ import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 // 相机控件
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { nextTick } from "process";
 const glbPath = "ilyushin-il-76.glb";
 const modelRef = ref<HTMLDivElement>();
 
@@ -232,7 +231,7 @@ onMounted(() => {
 
     
     render()
-    animate() 
+    // animate() 
   });
 
   loader.load('/models/tree.gltf', (result) => {

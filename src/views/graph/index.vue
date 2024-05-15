@@ -1,20 +1,19 @@
 <template>
-  <div ref="testRef"></div>
+  <div ref="testRef">
+    <el-space direction="vertical">
+      <el-button @click="printGraph">打印图数据</el-button>
+      <el-divider></el-divider>
+      <el-button @click="depSearch">深度优先搜索</el-button>
+      <el-button @click="pathTo">深度优先路径</el-button>
+      <el-button @click="breadPathTo">广度优先路径</el-button>
+      <el-button @click="prinCcc">深度递归连通分量</el-button>
+    </el-space>
+
+  </div>
 </template>
 <script setup lang="ts">
-import { ref } from "vue";
-// import init from './uf'
-import { bfsSearch } from "./search";
-const testRef = ref();
-import { initEWD} from './graph/edge-graph'
-// import toBeTxt from './files/toBe.txt?raw'
-// import { dfsSearch, readTinyG } from "./graph";
-// console.log(toBeTxt)
-// readTinyG()
-// dfsSearch()
-// init()
-
-// bfsSearch()
-initEWD()
+import {printGraph} from '@/graphs/graph'
+ import{depSearch} from '@/graphs/search'
+ import {pathTo, breadPathTo, prinCcc} from '@/graphs/paths'
 </script>
 <style scoped lang="scss"></style>

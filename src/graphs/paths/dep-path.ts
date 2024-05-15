@@ -1,4 +1,5 @@
-import { Graph } from "./graph";
+import { Stack } from "../data-struct"
+import { Graph } from "../graph"
 
 export class DepthFirstPaths {
     public marked: boolean[]
@@ -32,8 +33,15 @@ export class DepthFirstPaths {
     }
 
     public pathTo(v: number){
+        const path = new Stack<number>()
         if(!this.hasPathTo(v)) {
-            return null
+            return path
         }
+        for(let x = v; x !== this.source; x = this.edgeTo[x]) {
+            path.push(x)
+        }
+        path.push(this.source)
+        return path
+
     }
 }
