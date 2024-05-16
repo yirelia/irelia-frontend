@@ -2,7 +2,9 @@
   <div ref="testRef">
     <el-space direction="vertical">
       <el-button @click="printGraph">打印图数据</el-button>
-      <el-divider></el-divider>
+      <el-button @click="printDiagraph">打印dir图数据</el-button>
+      <!-- <el-divider></el-divider> -->
+      <br>
       <el-button @click="depSearch">深度优先搜索</el-button>
       <el-button @click="pathTo">深度优先路径</el-button>
       <el-button @click="breadPathTo">广度优先路径</el-button>
@@ -12,7 +14,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import {printGraph} from '@/graphs/graph'
+import {printGraph, printDiagraph} from '@/graphs/graph'
  import{depSearch} from '@/graphs/search'
  import {pathTo, breadPathTo, prinCcc} from '@/graphs/paths'
 </script>
