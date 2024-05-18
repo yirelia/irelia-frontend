@@ -1,10 +1,10 @@
 import { Bag } from "../data-struct";
 import { initDiagraphTindyDG, readTinyCG, readTinyG } from "../graph";
-import { Diagraph } from "../graph/diagraph";
 import { BreadthFirstPaths } from "./breadth-path";
 import { CC } from "./cc";
 import { DepthFirstPaths } from "./dep-path";
 import { DirectDFPaths } from "./direc-df-path";
+import { DirectedCycle } from "./direct-cycle";
 export function pathTo() {
   const graph = readTinyCG();
   const depthPath = new DepthFirstPaths(graph, 0);
@@ -74,6 +74,16 @@ export function testDirectDFPaths() {
     }
   }
 
-  
+
   console.log(`[1,2, 6]:`, s)
+}
+
+export function hasCycle() {
+  const graph = initDiagraphTindyDG();
+  const hCycle = new DirectedCycle(graph)
+  console.log(`是否含有环： `,hCycle.hasCycle())
+  if(hCycle.hasCycle()) {
+    console.log(hCycle.cycle.collention.join('->'))
+  }
+
 }

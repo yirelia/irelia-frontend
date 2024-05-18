@@ -10,6 +10,7 @@
       <el-button @click="breadPathTo">广度优先路径</el-button>
       <el-button @click="prinCcc">深度递归连通分量</el-button>
       <el-button @click="testDirectDFPaths">深度递归连通分量</el-button>
+      <el-button @click="hasCycle">图是否有环</el-button>
     </el-space>
 
   </div>
@@ -17,6 +18,6 @@
 <script setup lang="ts">
 import {printGraph, printDiagraph} from '@/graphs/graph'
  import{depSearch} from '@/graphs/search'
- import {pathTo, breadPathTo, prinCcc, testDirectDFPaths} from '@/graphs/paths'
+ import {pathTo, breadPathTo, prinCcc, testDirectDFPaths,hasCycle} from '@/graphs/paths'
 </script>
 <style scoped lang="scss"></style>
