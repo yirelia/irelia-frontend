@@ -47,7 +47,33 @@ export function prinCcc() {
 export function testDirectDFPaths() {
   const graph = initDiagraphTindyDG();
   console.log("===== diagraph paths ======");
-  const reachable = new Diagraph(1);
   const directDfPath = new DirectDFPaths(graph, 1);
-  console.log(directDfPath);
+  let s = ''
+  for(let v = 0; v < graph.V; v++) {
+    if(directDfPath.marked[v]) {
+      s += `${v} `
+    }
+  }
+  console.log(`[1]:`, s)
+
+  s = ''
+  const directDfPath1 = new DirectDFPaths(graph, 2);
+  s = ''
+  for(let v = 0; v < graph.V; v++) {
+    if(directDfPath1.marked[v]) {
+      s += `${v} `
+    }
+  }
+  console.log(`[2]:`, s)
+  s = ''
+  const directDfPath2 = new DirectDFPaths(graph, [1, 2, 6]);
+  s = ''
+  for(let v = 0; v < graph.V; v++) {
+    if(directDfPath2.marked[v]) {
+      s += `${v} `
+    }
+  }
+
+  
+  console.log(`[1,2, 6]:`, s)
 }

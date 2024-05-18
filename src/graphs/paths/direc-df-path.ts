@@ -1,6 +1,6 @@
 import { Diagraph } from "../graph";
 export class DirectDFPaths {
-  private marked: boolean[];
+  public marked: boolean[];
   constructor(graph: Diagraph, source: number | number[]) {
     this.marked = Array.from({ length: graph.V }, () => false);
     if (Array.isArray(source)) {
