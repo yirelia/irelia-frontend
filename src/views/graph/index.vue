@@ -9,7 +9,7 @@
       <el-button @click="pathTo">深度优先路径</el-button>
       <el-button @click="breadPathTo">广度优先路径</el-button>
       <el-button @click="prinCcc">深度递归连通分量</el-button>
-      <el-button @click="testDirectDFPaths">深度递归连通分量</el-button>
+      <el-button @click="testDirectDFPaths">有向图dfs查看可达</el-button>
       <el-button @click="hasCycle">图是否有环</el-button>
     </el-space>
 
