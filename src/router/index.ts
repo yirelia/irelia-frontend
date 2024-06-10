@@ -66,6 +66,13 @@ export const routes = [
       name: "图数据",
     },
   },
+  {
+    path: "/rAFrame",
+    component: () => import("@/views/annitions/index.vue"),
+    meta: {
+      name: "rAFrame",
+    },
+  },
 ];
 const router = createRouter({
   history: createWebHistory(),
