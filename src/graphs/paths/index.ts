@@ -1,10 +1,13 @@
 import { Bag } from "../data-struct";
-import { initDiagraphTindyDG, readTinyCG, readTinyG } from "../graph";
+import { initDiagraphTindyDG, initEWD, readTinyCG, readTinyG } from "../graph";
 import { BreadthFirstPaths } from "./breadth-path";
 import { CC } from "./cc";
 import { DepthFirstPaths } from "./dep-path";
 import { DirectDFPaths } from "./direc-df-path";
 import { DirectedCycle } from "./direct-cycle";
+export * from './mst'
+
+
 export function pathTo() {
   const graph = readTinyCG();
   const depthPath = new DepthFirstPaths(graph, 0);
@@ -49,8 +52,8 @@ export function testDirectDFPaths() {
   console.log("===== diagraph paths ======");
   const directDfPath = new DirectDFPaths(graph, 1);
   let s = ''
-  for(let v = 0; v < graph.V; v++) {
-    if(directDfPath.marked[v]) {
+  for (let v = 0; v < graph.V; v++) {
+    if (directDfPath.marked[v]) {
       s += `${v} `
     }
   }
@@ -59,8 +62,8 @@ export function testDirectDFPaths() {
   s = ''
   const directDfPath1 = new DirectDFPaths(graph, 2);
   s = ''
-  for(let v = 0; v < graph.V; v++) {
-    if(directDfPath1.marked[v]) {
+  for (let v = 0; v < graph.V; v++) {
+    if (directDfPath1.marked[v]) {
       s += `${v} `
     }
   }
@@ -68,8 +71,8 @@ export function testDirectDFPaths() {
   s = ''
   const directDfPath2 = new DirectDFPaths(graph, [1, 2, 6]);
   s = ''
-  for(let v = 0; v < graph.V; v++) {
-    if(directDfPath2.marked[v]) {
+  for (let v = 0; v < graph.V; v++) {
+    if (directDfPath2.marked[v]) {
       s += `${v} `
     }
   }
@@ -81,9 +84,13 @@ export function testDirectDFPaths() {
 export function hasCycle() {
   const graph = initDiagraphTindyDG();
   const hCycle = new DirectedCycle(graph)
-  console.log(`是否含有环： `,hCycle.hasCycle())
-  if(hCycle.hasCycle()) {
+  console.log(`是否含有环： `, hCycle.hasCycle())
+  if (hCycle.hasCycle()) {
     console.log(hCycle.cycle.collention.join('->'))
   }
 
+}
+
+export function testEdgeWeightedGraph() {
+  initEWD()
 }

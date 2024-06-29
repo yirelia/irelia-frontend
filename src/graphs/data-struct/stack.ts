@@ -1,4 +1,4 @@
-export class Stack<T> {
+export class Stack<T extends unknown = any> {
     public collention: T[]
     constructor() {
         this.collention = []
@@ -7,8 +7,8 @@ export class Stack<T> {
     public push(item: T) {
         this.collention.push(item)
     }
-    
-    public pop(): T | undefined  {
+
+    public pop(): T | undefined {
         return this.collention.pop()
     }
 
