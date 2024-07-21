@@ -73,6 +73,13 @@ export const routes = [
       name: "rAFrame",
     },
   },
+  {
+    path: "/fault-tree",
+    component: () => import("@/views/fault-tree/index.vue"),
+    meta: {
+      name: "故障树",
+    },
+  },
 ];
 const router = createRouter({
   history: createWebHistory(),
