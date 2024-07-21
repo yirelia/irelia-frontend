@@ -74,6 +74,13 @@ export const routes = [
     },
   },
   {
+    path: "/x6",
+    component: () => import("@/views/x6/index.vue"),
+    meta: {
+      name: "x6graph",
+    },
+  },
+  {
     path: "/fault-tree",
     component: () => import("@/views/fault-tree/index.vue"),
     meta: {

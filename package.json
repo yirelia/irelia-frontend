@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@antv/x6": "^2.15.4",
+    "@antv/x6-plugin-snapline": "^2.1.7",
     "@types/node": "^20.6.0",
     "axios": "^1.6.0",
     "bignumber.js": "^9.0.1",
