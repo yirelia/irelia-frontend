@@ -1,6 +1,44 @@
 import { Node } from "@antv/x6";
-import { ports } from "./port";
-
+export const ports = {
+    groups: {
+        top: {
+            position: 'top',
+            attrs: {
+                circle: {
+                    r: 10,
+                    magnet: true,
+                    stroke: 'red',
+                    strokeWidth: 1,
+                    fill: '#fff',
+                    style: {
+                        visibility: 'hidden',
+                    },
+                },
+            },
+        },
+        bottom: {
+            position: 'bottom',
+            attrs: {
+                circle: {
+                    r: 10,
+                    magnet: true,
+                    stroke: 'green',
+                    strokeWidth: 1,
+                    fill: '#fff',
+                    style: {
+                        visibility: 'hidden',
+                    },
+                },
+            },
+        },
+    },
+    items: [
+        {
+            group: 'bottom',
+            id: 'bottom'
+        },
+    ],
+}
 export class CFalut extends Node {
     private isActive = false
 
@@ -59,4 +97,7 @@ CFalut.config({
     },
     ports: { ...ports }
 })
+
+
+
 

@@ -10,15 +10,21 @@
     </el-aside>
     <el-main>
       <div ref="faultTreeRef" style="height : 100%"></div>
+      <teleport-container />
     </el-main>
   </el-container>
 </template>
 <script setup lang="ts">
   import { Graph, Shape } from "@antv/x6";
   import { onMounted, ref } from "vue";
-  import { AndGate, CFalut, Falut, OrGate } from "./coustom-node";
+  import { registerCharts, CFalut, Falut, OrGate } from "./coustom-node";
   import { Snapline } from '@antv/x6-plugin-snapline'
   import { ElMessage } from "element-plus";
+  import { getTeleport } from "@antv/x6-vue-shape";
+  // 挂载自定义节点
+  const TeleportContainer = getTeleport()
+  registerCharts()
+
   const faultTreeRef = ref<HTMLElement>();
   const graph = ref<Graph>();
 
@@ -262,6 +268,22 @@
         port: 'bottom'
       }
     })
+
+    // graph.value.addNode({
+    //   shape: 'lineChart',
+    //   x: 100,
+    //   y: 100,
+    //   width: 400,
+    //   height: 300
+    // })
+
+    // graph.value.addNode({
+    //   shape: 'gaugeChart',
+    //   x: 400,
+    //   y: 100,
+    //   width: 400,
+    //   height: 400
+    // })
 
     graph.value.centerContent()
   });

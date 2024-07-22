@@ -4,9 +4,9 @@ export const ports = {
             position: 'top',
             attrs: {
                 circle: {
-                    r: 4,
+                    r: 10,
                     magnet: true,
-                    stroke: '#5F95FF',
+                    stroke: 'red',
                     strokeWidth: 1,
                     fill: '#fff',
                     style: {
@@ -15,28 +15,28 @@ export const ports = {
                 },
             },
         },
-        right: {
-            position: 'right',
-            attrs: {
-                circle: {
-                    r: 4,
-                    magnet: true,
-                    stroke: '#5F95FF',
-                    strokeWidth: 1,
-                    fill: '#fff',
-                    style: {
-                        visibility: 'hidden',
-                    },
-                },
-            },
-        },
+        // right: {
+        //     position: 'right',
+        //     attrs: {
+        //         circle: {
+        //             r: 4,
+        //             magnet: true,
+        //             stroke: '#5F95FF',
+        //             strokeWidth: 1,
+        //             fill: '#fff',
+        //             style: {
+        //                 visibility: 'hidden',
+        //             },
+        //         },
+        //     },
+        // },
         bottom: {
             position: 'bottom',
             attrs: {
                 circle: {
-                    r: 4,
+                    r: 10,
                     magnet: true,
-                    stroke: '#5F95FF',
+                    stroke: 'green',
                     strokeWidth: 1,
                     fill: '#fff',
                     style: {
@@ -45,21 +45,21 @@ export const ports = {
                 },
             },
         },
-        left: {
-            position: 'left',
-            attrs: {
-                circle: {
-                    r: 4,
-                    magnet: true,
-                    stroke: '#5F95FF',
-                    strokeWidth: 1,
-                    fill: '#fff',
-                    style: {
-                        visibility: 'hidden',
-                    },
-                },
-            },
-        },
+        // left: {
+        //     position: 'left',
+        //     attrs: {
+        //         circle: {
+        //             r: 4,
+        //             magnet: true,
+        //             stroke: '#5F95FF',
+        //             strokeWidth: 1,
+        //             fill: '#fff',
+        //             style: {
+        //                 visibility: 'hidden',
+        //             },
+        //         },
+        //     },
+        // },
     },
     items: [
         {
@@ -67,16 +67,8 @@ export const ports = {
             id: 'top'
         },
         {
-            group: 'right',
-            id: 'right'
-        },
-        {
             group: 'bottom',
             id: 'bottom'
-        },
-        {
-            group: 'left',
-            id: 'left'
         },
     ],
 }

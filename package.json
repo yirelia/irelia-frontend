@@ -10,10 +10,13 @@
   },
   "dependencies": {
     "@antv/x6": "^2.15.4",
+    "@antv/x6-plugin-selection": "^2.2.2",
     "@antv/x6-plugin-snapline": "^2.1.7",
+    "@antv/x6-vue-shape": "^2.1.2",
     "@types/node": "^20.6.0",
     "axios": "^1.6.0",
     "bignumber.js": "^9.0.1",
+    "echarts": "^5.5.1",
     "element-plus": "^2.3.12",
     "fast-xml-parser": "^4.3.3",
     "mitt": "^3.0.1",
