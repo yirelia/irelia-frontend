@@ -87,6 +87,13 @@ export const routes = [
       name: "故障树",
     },
   },
+  {
+    path: "/flight",
+    component: () => import("@/views/learn-three/chart-01/index.vue"),
+    meta: {
+      name: "飞机小游戏",
+    },
+  },
 ];
 const router = createRouter({
   history: createWebHistory(),
