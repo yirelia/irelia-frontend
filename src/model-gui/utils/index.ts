@@ -7,18 +7,23 @@ BigNumber.config({
 });
 
 /**
- * @description: 字符串转为坐标对象
- * @param {string} strPoint
+ * @description: 坐标处理
+ * @param {string} point
  * @param {*} sx
  * @param {*} sy
  * @return {*}
  */
 export function toPoint(
-  strPoint: string,
+  point: number[] | string,
   sx: number = 1,
   sy: number = 1
 ): Point {
-  const [x, y] = strPoint.split(',').map(item => toNum(item)) as PointTuple;
+  let [x, y] = [0, 0];
+  if (Array.isArray(point)) {
+    [x, y] = point;
+  } else {
+    [x, y] = point.split(',').map(item => toNum(item)) as PointTuple;
+  }
   const ponintX = new BigNumber(x).multipliedBy(sx).toNumber();
   // y 轴坐标转换
   const poninty = new BigNumber(-y).multipliedBy(sy).toNumber();
@@ -62,7 +67,11 @@ export function getBigNumerIntance(
   return BigNumber.clone(config);
 }
 
-export function toRgbColor(color: string) {
+export function toRgbColor(color: string | number[]) {
+  if (!color) return '';
+  if (Array.isArray(color)) {
+    color = color.join(',');
+  }
   return `rgb(${color})`;
 }
 
@@ -84,7 +93,28 @@ export function rgb2hex(r: number, g: number, b: number): string {
  * @param {string} color
  * @return {*}
  */
-export function toHexColor(color: string): string {
+export function toHexColor(color: string | number[]): string {
+  if (!color) return '';
+  if (Array.isArray(color)) {
+    const [r, g, b] = color;
+    return rgb2hex(r, g, b);
+  }
   const [r, g, b] = color.split(',').map(item => toNum(item));
   return rgb2hex(r, g, b);
+}
+
+type ArgumentsArr = [number[][], any];
+/**
+ * 获取lineColor fillColor extentsPoints等数值，可能直接数组，也可能是对象
+ */
+export function getColorOrPoint(
+  target: number[] | { arguments: ArgumentsArr }
+): any {
+  if (!target) return;
+  if (Array.isArray(target)) {
+    return target;
+  }
+  if (target?.arguments) {
+    return target.arguments[0];
+  }
 }

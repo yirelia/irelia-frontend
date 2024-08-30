@@ -1,14 +1,15 @@
 import type { Graph } from '@antv/x6';
 import { ShapeType } from '../enums';
-import type { DiagramShape, PointArray } from '../model';
+import type { PointArray } from '../model';
 import ShapeAnnotation from './shape-annotation';
 import type { Component } from '../components/component';
+import type { DiagramCell } from '@/views/simulation/model/components/graphics/type';
 export default class PolygonAnnotation extends ShapeAnnotation {
   tag = ShapeType.Polygon;
   private isBezier = false;
-  constructor(graph: Graph, shape: DiagramShape, parent?: Component) {
+  constructor(graph: Graph, shape: DiagramCell, parent?: Component) {
     super(graph, shape, parent);
-    this.isBezier = this.rawShape.smooth === 'Smooth.Bezier';
+    this.isBezier = this.rawShape.smooth?.name === 'Smooth.Bezier';
   }
 
   public markup() {
@@ -48,13 +49,13 @@ export default class PolygonAnnotation extends ShapeAnnotation {
    * @param {boolean} isBezier
    * @return {*}
    */
-  public getLine(linePoints, isBezier: boolean) {
+  public getLine(linePoints: PointArray, isBezier: boolean) {
     return isBezier
       ? this.formatPolylineSmoothPath(linePoints)
       : this.formatPolylineNomalPath(linePoints);
   }
 
-  public formatPolylineSmoothPath(linePoints) {
+  public formatPolylineSmoothPath(linePoints: PointArray) {
     const pointLen = linePoints.length;
     const path = [];
     if (pointLen > 0) {

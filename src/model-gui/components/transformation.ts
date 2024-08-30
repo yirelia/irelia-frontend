@@ -207,7 +207,7 @@ export class Transform {
     originX?: number,
     originY?: number
   ): Transform {
-    if (originX != undefined && originY != undefined) {
+    if (originX !== undefined && originY !== undefined) {
       this.transform.push(
         `translate(${originX},${originY})`,
         `scale(${sx},${sy})`,

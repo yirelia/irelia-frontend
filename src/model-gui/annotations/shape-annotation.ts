@@ -1,9 +1,15 @@
 import type { Graph } from '@antv/x6';
+import { map } from 'lodash-es';
 import { Transformation } from '../components/transformation';
-import type { DiagramShape, Point } from '../model';
+import type { Point } from '../model';
+import type {
+  DiagramCell,
+  LineStyle
+} from '@/views/simulation/model/components/graphics/type';
 import {
   convertMMToPixel,
   getBigNumerIntance,
+  getColorOrPoint,
   toHexColor,
   toNum,
   toPoint,
@@ -19,11 +25,10 @@ import {
   ViewType
 } from '../enums';
 import { definePattern } from '../pattern';
-
 const BigNumber = getBigNumerIntance();
 export default abstract class ShapeAnnotation {
   // 方法需要使用
-  public rawShape!: DiagramShape;
+  public rawShape!: DiagramCell;
   public stroke = `#000000`;
   public color = `#000000`;
   public strokeWidth = 0.25;
@@ -37,7 +42,6 @@ export default abstract class ShapeAnnotation {
   public extents = [];
   public startAngle = 0;
   public endAngle = 360;
-  public originalTextString = '';
   public textString = '';
   public fontSize = 12;
   public fontName = '';
@@ -73,7 +77,7 @@ export default abstract class ShapeAnnotation {
 
   // 默认的缩放比例
   public viewScale = ViewScale;
-  constructor(graph: Graph, shape: DiagramShape, component?: Component) {
+  constructor(graph: Graph, shape: DiagramCell, component?: Component) {
     this.graph = graph;
     this.rawShape = shape;
     if (component) {
@@ -82,22 +86,29 @@ export default abstract class ShapeAnnotation {
     this.initShapePoints(this.rawShape);
     this.setArrowType(this.rawShape.arrow);
     this.rotation = -toNum(shape.rotation);
-    this.originalPoint = toPoint(shape.originalPoint);
+    if (shape.offset) {
+      this.originalPoint = toPoint(shape.offset);
+    }
     this.stroke = this.getStroke();
-    this.color = toRgbColor(this.rawShape.color);
+    const { lineColor } = this.rawShape;
+    this.color = toRgbColor(getColorOrPoint(lineColor as any));
     this.fill = this.getFillColor();
     this.strokeWidth = this.getStrokeWidth();
     this.opacity = this.rawShape.opacity === 0 ? 0 : 1;
     this.magnet = this.rawShape.magnet;
-    this.isSmooth = this.rawShape.smooth === 'smooth';
+    this.isSmooth = this.rawShape.smooth?.name === 'smooth';
     this.textColor = toRgbColor(this.rawShape.textColor);
 
-    this.originalTextString =
-      this.rawShape.originalTextString === '%name'
+    this.textString =
+      this.rawShape.textString === '%name'
         ? this.component?.componentInfo.name || ''
-        : this.rawShape.originalTextString;
+        : this.rawShape.textString;
     this.isDiagram = this.rawShape.diagram || false;
-    this.strokeDasharray = this.getStrokeDashArray(this.rawShape.linePattern);
+    if (this.rawShape.linePattern) {
+      this.strokeDasharray = this.getStrokeDashArray(
+        this.rawShape.linePattern?.name
+      );
+    }
     if (this.rawShape.imageBase64) {
       this.xlinkHref = `data:image/png;base64,${this.rawShape.imageBase64}`;
     }
@@ -120,25 +131,14 @@ export default abstract class ShapeAnnotation {
       FillPattern.CrossDiag
     ];
 
-    return patterns.includes(this.rawShape.fillPattern as FillPattern);
+    return patterns.includes(this.rawShape.fillPattern?.name as FillPattern);
   }
 
-  public initShapePoints(shape: DiagramShape) {
-    let points: string[] = [];
-    if (shape.type === 'Rectangle') {
-      points = shape.extentsPoints;
-    } else if (shape.type === 'Line') {
-      points = shape.points;
-    } else if (shape.type === 'Polygon') {
-      points = shape.polygonPoints;
-    } else if (shape.type === 'Ellipse') {
-      points = shape.extentsPoints;
-    } else if (shape.type === 'Text') {
-      points = shape.extentsPoints;
-    } else if (shape.type === 'Bitmap') {
-      points = shape.points;
+  public initShapePoints(shape: DiagramCell) {
+    const points = getColorOrPoint(shape?.extentsPoints as any) || [];
+    if (Array.isArray(points)) {
+      this.extentPoints = points.map(item => toPoint(item));
     }
-    this.extentPoints = points.map(item => toPoint(item));
   }
 
   /**
@@ -146,9 +146,9 @@ export default abstract class ShapeAnnotation {
    * @param {string} arrow
    * @return {*}
    */
-  public setArrowType(arrow: string): void {
+  public setArrowType(arrow: LineStyle[]): void {
     if (arrow) {
-      const [startArrow, endArrow] = arrow.split(',') as Arrow[];
+      const [startArrow, endArrow] = map(arrow, 'name') as Arrow[];
       this.startArrow = startArrow;
       this.endArrow = endArrow;
     }
@@ -159,25 +159,28 @@ export default abstract class ShapeAnnotation {
    * @return {*}
    */
   private getStroke(): string {
-    const { linePattern, color } = this.rawShape;
-    if (linePattern === 'LinePattern.None' || !color) {
+    const { linePattern, lineColor } = this.rawShape;
+    if (
+      (linePattern && linePattern?.name === 'LinePattern.None') ||
+      !lineColor
+    ) {
       return 'none';
     }
-    return toHexColor(color);
+    return toHexColor(getColorOrPoint(lineColor as any));
   }
 
   private getStrokeWidth(): number {
     const { borderPattern } = this.rawShape;
     // 规范中没有提到 boderpattern
     // 保持 Dymola 行为一致  border patterns raised & sunken 设置默认线条
-    let lineThickness = toNum(this.rawShape.lineThickness);
+    let thickness = toNum(this.rawShape.thickness);
     if (
-      borderPattern === BorderPattern.BorderRaised ||
-      borderPattern === BorderPattern.BorderSunken
+      borderPattern?.name === BorderPattern.BorderRaised ||
+      borderPattern?.name === BorderPattern.BorderSunken
     ) {
-      lineThickness = 0.25;
+      thickness = 0.25;
     }
-    return convertMMToPixel(lineThickness);
+    return convertMMToPixel(thickness);
   }
 
   /**
@@ -185,12 +188,21 @@ export default abstract class ShapeAnnotation {
    * @return {*}
    */
   public getFillColor() {
-    const { fillPattern, color, fillColor } = this.rawShape;
-    const fill = toHexColor(fillColor || '0,0,0');
-    const gradientColor = toHexColor(color || '0,0,0');
+    const { fillPattern, fillColor, lineColor } = this.rawShape;
+    const fill = toHexColor(
+      Array.isArray(fillColor)
+        ? fillColor
+        : (fillColor?.arguments[0] ?? [0, 0, 0])
+    );
+    const gradientColor = toHexColor(
+      Array.isArray(lineColor)
+        ? lineColor
+        : (lineColor?.arguments[0] ?? [0, 0, 0])
+    );
     const graph = this.graph;
     let gradientId = '';
-    switch (fillPattern) {
+    if (!fillPattern) return;
+    switch (fillPattern.name) {
       case FillPattern.Sphere:
         gradientId = graph.defineGradient({
           type: 'radialGradient',
@@ -244,7 +256,10 @@ export default abstract class ShapeAnnotation {
       case FillPattern.Vertical:
       case FillPattern.Cross:
       case FillPattern.CrossDiag:
-        return `url(#${this.getFillPatternId(fillPattern, gradientColor)})`;
+        return `url(#${this.getFillPatternId(
+          fillPattern?.name,
+          gradientColor
+        )})`;
       case FillPattern.None:
         return `transparent`;
       // never reach
@@ -255,14 +270,14 @@ export default abstract class ShapeAnnotation {
 
   /**
    * @description: 获取fillPattern ID
-   * @param {string} fillPattern
+   * @param {string} linePattern
    * @return {*}
    */
-  private getFillPatternId(fillPattern: string, fillColor: string) {
+  private getFillPatternId(linePattern: string, fillColor: string) {
     return definePattern(
       this.graph,
-      fillPattern,
-      `${fillPattern}.${fillColor}`,
+      linePattern,
+      `${linePattern}.${fillColor}`,
       fillColor
     );
   }
@@ -375,6 +390,15 @@ export default abstract class ShapeAnnotation {
    * @return {*}
    */
   public getBox(leftBottomPoint: Point, rightTopPoint: Point) {
+    if (!leftBottomPoint || !rightTopPoint) {
+      console.log('没有坐标');
+      return {
+        x: 0,
+        y: 0,
+        width: 0,
+        height: 0
+      };
+    }
     const width = Math.abs(leftBottomPoint.x - rightTopPoint.x);
     const height = Math.abs(leftBottomPoint.y - rightTopPoint.y);
     const center = this.center(leftBottomPoint, rightTopPoint);

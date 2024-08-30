@@ -1,13 +1,13 @@
-import type { DiagramShape, Point } from '../model';
+import type { Point } from '../model';
 import ShapeAnnotation from './shape-annotation';
 import { ShapeType } from '../enums';
 import type { Graph } from '@antv/x6';
 import type { Component } from '../components/component';
-
+import type { DiagramCell } from '@/views/simulation/model/components/graphics/type';
 export default class EllipseAnnotation extends ShapeAnnotation {
   tag = ShapeType.Ellipse;
 
-  constructor(graph: Graph, shape: DiagramShape, parent?: Component) {
+  constructor(graph: Graph, shape: DiagramCell, parent?: Component) {
     super(graph, shape, parent);
   }
 

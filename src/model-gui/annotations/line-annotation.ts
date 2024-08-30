@@ -1,15 +1,16 @@
 import type { Graph } from '@antv/x6';
 import { Arrow, ShapeType } from '../enums';
-import type { DiagramShape, PointArray } from '../model';
+import type { PointArray } from '../model';
 import ShapeAnnotation from './shape-annotation';
 import type { Component } from '../components/component';
+import type { DiagramCell } from '@/views/simulation/model/components/graphics/type';
 
 export default class LineAnnotation extends ShapeAnnotation {
   tag = ShapeType.Line;
   private isBezier = false;
-  constructor(graph: Graph, shape: DiagramShape, parent?: Component) {
+  constructor(graph: Graph, shape: DiagramCell, parent?: Component) {
     super(graph, shape, parent);
-    this.isBezier = this.rawShape.smooth === 'Smooth.Bezier';
+    this.isBezier = this.rawShape.smooth?.name === 'Smooth.Bezier';
   }
 
   /**
@@ -94,7 +95,7 @@ export default class LineAnnotation extends ShapeAnnotation {
    * @param {boolean} isBezier
    * @return {*}
    */
-  public getLine(linePoints, isBezier: boolean) {
+  public getLine(linePoints: PointArray, isBezier: boolean) {
     const pointLen = linePoints.length;
     const path = [];
     if (pointLen > 0) {
@@ -163,7 +164,7 @@ export default class LineAnnotation extends ShapeAnnotation {
     };
   }
 
-  public getMarkerId(key: string, options): string {
+  public getMarkerId(key: string, options: any): string {
     return key !== Arrow.None
       ? `url(#${this.graph.defineMarker(options)})`
       : 'url(#none)';

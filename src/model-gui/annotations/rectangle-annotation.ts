@@ -1,15 +1,15 @@
 import BigNumber from 'bignumber.js';
-import type { DiagramShape } from '../model';
+import type { DiagramCell } from '@/views/simulation/model/components/graphics/type';
 import ShapeAnnotation from './shape-annotation';
 import { ShapeType } from '../enums';
 import type { Graph } from '@antv/x6';
 import type { Component } from '../components/component';
-import { toHexColor } from '../utils';
+import { getColorOrPoint, toHexColor } from '../utils';
 
 export default class RectangleAnnotation extends ShapeAnnotation {
   tag = ShapeType.Rectangle;
 
-  constructor(graph: Graph, shape: DiagramShape, component?: Component) {
+  constructor(graph: Graph, shape: DiagramCell, component?: Component) {
     super(graph, shape, component);
   }
 
@@ -20,7 +20,8 @@ export default class RectangleAnnotation extends ShapeAnnotation {
     const { x, y, width, height } = this.getBox(p1, p2);
     const d = this.getDPath(x, y, width, height, radius);
     const transform = this.transformation.getTransformationMatrix();
-    const backFill = toHexColor(this.rawShape.fillColor);
+    const { fillColor }: { fillColor: any } = this.rawShape;
+    const backFill = toHexColor(getColorOrPoint(fillColor));
 
     if (this.hasFillPattern) {
       /*
@@ -146,7 +147,7 @@ export default class RectangleAnnotation extends ShapeAnnotation {
  * @param {Partial} rectangle
  * @return {*}
  */
-export const makeDefaultRectangle = (rectangle: Partial<DiagramShape>) => {
+export const makeDefaultRectangle = (rectangle: Partial<DiagramCell>) => {
   const { extentsPoints, magnet, opacity } = rectangle;
   return {
     borderPattern: 'BorderPattern.None',
@@ -154,9 +155,9 @@ export const makeDefaultRectangle = (rectangle: Partial<DiagramShape>) => {
     points: [],
     extentsPoints,
     fillColor: '192,192,192',
-    fillPattern: 'FillPattern.Solid',
-    linePattern: 'LinePattern.none',
-    lineThickness: '0.25',
+    fillPattern: { name: 'FillPattern.Solid' },
+    linePattern: { name: 'LinePattern.none' },
+    thickness: '0.25',
     originalPoint: '0.0,0.0',
     radius: '0.0',
     rotation: '0.0',

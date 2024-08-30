@@ -4,13 +4,13 @@ import { Transform } from '../components/transformation';
 import { ShapeType } from '../enums';
 import { getBigNumerIntance, getNormalizedAngle } from '../utils';
 import ShapeAnnotation from './shape-annotation';
-import type { DiagramShape } from '../model';
+import type { DiagramCell } from '@/views/simulation/model/components/graphics/type';
 
 export default class TextAnnotation extends ShapeAnnotation {
   public tag = ShapeType.Text;
   // 最小文本大小 8pt => 8 * (72 / 96)
   private minimumFontSize = 6;
-  constructor(graph: Graph, shape: DiagramShape, parent?: Component) {
+  constructor(graph: Graph, shape: DiagramCell, parent?: Component) {
     super(graph, shape, parent);
   }
 
@@ -20,14 +20,14 @@ export default class TextAnnotation extends ShapeAnnotation {
    * @return {*}
    */
   public markup() {
-    const { textColor, originalTextString } = this;
+    const { textColor, textString } = this;
     const [p1, p2] = this.getPathPoint();
     const { x, y, width, height } = this.getBox(p1, p2);
     const transform = this.transformation.getTransformationMatrix();
     const divHight = `${height}px`;
     const htmlTransform = this.getTextTransformScale(transform);
     const fontObj = this.patchFontSize(
-      originalTextString,
+      textString,
       this.minimumFontSize,
       width,
       height
@@ -57,7 +57,7 @@ export default class TextAnnotation extends ShapeAnnotation {
             fontSize: `${fontObj.fontSize}px`,
             transform: htmlTransform
           },
-          textContent: originalTextString
+          textContent: textString
         }
       ]
     };

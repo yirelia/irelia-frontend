@@ -1,15 +1,16 @@
 import type { Graph } from '@antv/x6';
-import type { DiagramEdage, Point } from '../model';
+import { map } from 'lodash-es';
+import type { Point } from '../model';
 import { convertMMToPixel, toNum, toPoint } from '../utils';
 import { GraphDataTagEnum, ShapeLayer, ViewScale } from '../enums';
-
+import type { LineCell } from '@/views/simulation/model/components/graphics/type';
 /**
  * @description: 边的类型
  * @return {*}
  */
 export class ComponentEdge {
   public graph: Graph;
-  public edge: DiagramEdage;
+  public edge: LineCell;
 
   static viewScale = ViewScale;
 
@@ -26,12 +27,14 @@ export class ComponentEdge {
   // 间隔线
   public strokeDasharray = 0;
 
-  constructor(graph: Graph, edge: DiagramEdage) {
+  constructor(graph: Graph, edge: LineCell) {
     this.graph = graph;
     this.edge = edge;
-    this.extentPoints = edge.points.map(point =>
-      toPoint(point, ComponentEdge.viewScale, ComponentEdge.viewScale)
-    );
+    if (edge.points) {
+      this.extentPoints = edge.points.map(point =>
+        toPoint(point, ComponentEdge.viewScale, ComponentEdge.viewScale)
+      );
+    }
     this.setConfig();
   }
 
@@ -40,31 +43,34 @@ export class ComponentEdge {
    * @return {*}
    */
   public setConfig() {
-    this.strokeWidth = convertMMToPixel(toNum(this.edge.lineThickness));
-    this.stroke = `rgb(${this.edge.color})`;
+    this.strokeWidth = convertMMToPixel(toNum(this.edge.thickness || 0.25));
+    this.stroke = `rgb(${this.edge.color || [0, 0, 127]})`;
     this.strokeDasharray =
-      this.edge.linePattern !== 'LinePattern.Solid' ? 5 : 0;
+      this.edge.linePattern &&
+      this.edge.linePattern?.name !== 'LinePattern.Solid'
+        ? 5
+        : 0;
   }
 
   /**
-   * @description: 新增边
+   * @description: 新增边,TODO,新的接口类型可以简化
    * @return {*}
    */
-  public addEdge() {
-    let sourceId = this.edge.connectionfrom;
-    let targetId = this.edge.connectionto;
+  public addEdge(isBatch = false) {
+    let sourceId = map(this.edge.lhs, 'name').join('.');
+    let targetId = map(this.edge.rhs, 'name').join('.');
     const vertices = this.extentPoints;
     let sourceCell = this.graph.getCellById(sourceId);
     if (!sourceCell) {
       sourceCell = this.getIOConnectCell(sourceId)!;
-      if (sourceId.includes('.')) {
+      if (sourceId?.includes('.')) {
         sourceId = sourceId.split('.')[0];
       }
     }
     let targetCell = this.graph.getCellById(targetId);
     if (!targetCell) {
       targetCell = this.getIOConnectCell(targetId)!;
-      if (targetId.includes('.')) {
+      if (targetId?.includes('.')) {
         targetId = targetId.split('.')[0];
       }
     }
@@ -73,7 +79,7 @@ export class ComponentEdge {
         tag: GraphDataTagEnum.DiagramEdge,
         data: this.edge
       };
-      return this.graph.addEdge({
+      const edge = {
         source: { cell: sourceId, selector: '[magnet="true"]' },
         target: { cell: targetId, selector: '[magnet="true"]' },
         vertices,
@@ -91,6 +97,15 @@ export class ComponentEdge {
             }
           }
         },
+        // router: {
+        //   name: 'manhattan',
+        //   args: {
+        //     excludeTerminals: ['source', 'target'],
+        //     excludeHiddenNodes: true,
+        //     excludeNodes: obstacles,
+        //     padding: 0
+        //   }
+        // },
         attrs: {
           line: {
             sourceMarker: {
@@ -108,14 +123,15 @@ export class ComponentEdge {
         },
         data,
         zIndex: this.zIndex
-      });
+      };
+      return isBatch ? edge : this.graph.addEdge(edge);
     }
   }
 
   /**
    * @description: 获取可连接的组件
    *  场景1： 查询到 输入输出组件 直接返回
-   *  场景2： 未查询 IO 组件 则查询IO的父组件，根据 graphType 决定是否返回 connector
+   *  场景2： 未查询 IO 组件 则查询IO的父组件，根据 restriction 决定是否返回 connector
    * @param {*} cellId
    * @return {*}
    */
@@ -124,13 +140,13 @@ export class ComponentEdge {
     if (targetCell) {
       return targetCell;
     }
-    if (!ioCellId.includes('.')) {
+    if (!ioCellId?.includes('.')) {
       return null;
     }
     const parnetCellName = ioCellId.split('.')[0];
     const parnetCell = this.graph?.getCellById(parnetCellName);
-    const data = parnetCell.getData();
-    if (data?.data?.graphType.includes('connector')) {
+    const data = parnetCell?.getData();
+    if (data?.data?.restriction?.includes('connector')) {
       return parnetCell;
     }
     return null;

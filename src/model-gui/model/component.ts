@@ -4,10 +4,9 @@
  */
 
 import type { DiagramShape } from './shape';
-
-export interface visibleItem {
+export interface VisibleItem {
   hasChild: boolean;
-  option: visibleItem[] | null;
+  option: VisibleItem[] | null;
   variableName: string;
 }
 
@@ -15,7 +14,7 @@ export interface DiagramComponent {
   classname: string;
   extent1Diagram: string; // 左下角坐标
   extent2Diagram: string; // 右上角坐标
-  graphType: string;
+  restriction: string;
   inputOutputs: DiagramComponent[];
   mobility: false;
   name: string;
@@ -33,7 +32,7 @@ export interface DiagramComponent {
   is_extend?: boolean; // 是否为继承
   extend_name: string; // 继承类的名称
   connector_sizing?: number; // 连接数
-  visibleList: visibleItem[]; // 变量数组
+  visibleList: VisibleItem[]; // 变量数组
   coordinate_system: CoOrdinateSystem;
 }
 

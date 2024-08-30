@@ -1,10 +1,10 @@
 import type { Graph } from '@antv/x6';
 import type { Component } from '../components/component';
-import type { DiagramShape } from '../model';
 import ShapeAnnotation from './shape-annotation';
+import type { DiagramCell } from '@/views/simulation/model/components/graphics/type';
 
 export default class BitmapAnnotation extends ShapeAnnotation {
-  constructor(graph: Graph, shape: DiagramShape, parent?: Component) {
+  constructor(graph: Graph, shape: DiagramCell, parent?: Component) {
     super(graph, shape, parent);
   }
 

@@ -1,5 +1,5 @@
 import type { Graph, Markup } from '@antv/x6';
-import type { DiagramShape } from '../model';
+import type { DiagramCell } from '@/views/simulation/model/components/graphics/type';
 import {
   BitmapAnnotation,
   EllipseAnnotation,
@@ -12,9 +12,9 @@ import { GraphDataTagEnum, ShapeLayer } from '../enums';
 
 export class Diagram {
   public graph: Graph;
-  public rawShape: DiagramShape;
+  public rawShape: DiagramCell;
   public zIndex = ShapeLayer.AnnotationZIndex;
-  constructor(graph: Graph, shape: DiagramShape) {
+  constructor(graph: Graph, shape: DiagramCell) {
     this.graph = graph;
     this.rawShape = shape;
   }
@@ -77,5 +77,19 @@ export class Diagram {
       zIndex,
       markup
     });
+  }
+  // 只返回节点数据，批量添加
+  public getNode() {
+    const markup = this.getMarkUp();
+    const { zIndex } = this;
+    // 此处坐标系就是原点，不需要移动
+    return {
+      data: {
+        tag: GraphDataTagEnum.Diagram,
+        data: this.rawShape
+      },
+      zIndex,
+      markup
+    };
   }
 }

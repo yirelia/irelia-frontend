@@ -1,4 +1,5 @@
-import { CoOrdinateSystem, Point } from '../model';
+import { Point } from '../model';
+import type { CoordinateSystem as CoordinateSystemType } from '@/views/simulation/model/components/graphics/type';
 
 export default class CoordinateSystem {
   private extent = [new Point(-100, -100), new Point(100, 100)];
@@ -21,15 +22,18 @@ export default class CoordinateSystem {
 
   constructor() {}
 
-  public updateCoordinateSystem(coordinateSystem: CoOrdinateSystem) {
-    const [extent1x, extent1y] = coordinateSystem.extent1_diagram;
-    const [extent2x, extent2y] = coordinateSystem.extent2_diagram;
-    this.extent = [
-      new Point(extent1x, -extent1y),
-      new Point(extent2x, -extent2y)
-    ];
-    this.setInitialScale(coordinateSystem.initial_scale);
-    this.setPreserveAspectRatio(coordinateSystem.preserve_aspect_ratio);
+  public updateCoordinateSystem(coordinateSystem: CoordinateSystemType) {
+    if (coordinateSystem.extent) {
+      const [extent1x, extent1y] = coordinateSystem.extent[0];
+      const [extent2x, extent2y] = coordinateSystem.extent[1];
+      this.extent = [
+        new Point(extent1x, -extent1y),
+        new Point(extent2x, -extent2y)
+      ];
+    }
+
+    this.setInitialScale(coordinateSystem?.initialScale ?? 0.1);
+    this.setPreserveAspectRatio(coordinateSystem?.preserveAspectRatio ?? true);
   }
 
   public setExtent(extent: Point[]) {

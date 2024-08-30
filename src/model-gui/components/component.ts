@@ -1,6 +1,9 @@
 import { ComponentInfo } from './component-info';
 import type { Graph, Markup } from '@antv/x6';
-import type { DiagramComponent } from '../model';
+import type {
+  DiagramCell,
+  GraphCell
+} from '@/views/simulation/model/components/graphics/type';
 import { GraphDataTagEnum, ShapeLayer, ViewScale, ViewType } from '../enums';
 import {
   BitmapAnnotation,
@@ -30,7 +33,7 @@ export class Component {
 
   constructor(
     graph: Graph,
-    componentInfo: DiagramComponent,
+    componentInfo: GraphCell,
     type = ViewType.Diagram,
     parentComponent?: Component
   ) {
@@ -43,7 +46,7 @@ export class Component {
     this.graph = graph;
     this.componentType = type;
     this.coordinateSystem.updateCoordinateSystem(
-      componentInfo.coordinate_system
+      componentInfo.coordinateSystem
     );
 
     this.coordinateSystem.setFlipX(this.componentInfo.flipX);
@@ -57,15 +60,15 @@ export class Component {
 
   public getMarkUp(): Markup {
     const shapeList = [];
-    let subShapes = {} as any;
+    let subShapes: DiagramCell[] = [];
     if (
       (this.componentType === ViewType.Diagram &&
-        this.componentInfo.rawComponentInfo.graphType === 'block') ||
-      this.componentInfo.rawComponentInfo.graphType === 'model'
+        this.componentInfo.rawComponentInfo.restriction === 'block') ||
+      this.componentInfo.rawComponentInfo.restriction === 'model'
     ) {
       subShapes = this.componentInfo.getSubShapeNoCenter();
     } else {
-      subShapes = this.componentInfo.getSubShape();
+      subShapes = this.componentInfo.getSubShape() as DiagramCell[];
     }
     for (const shape of subShapes) {
       if (shape.type === 'Rectangle') {
@@ -85,12 +88,12 @@ export class Component {
     return (
       shapeList
         // .map(item => item.markup())
-        .reduce((markups, item) => {
+        .reduce((markups: any[], item) => {
           /*
            * 兼容特殊场景处理
            * FillPattern 为 pattern类型的特殊处理
            */
-          const markup = item.markup();
+          const markup = item.markup() as any[];
           if (Array.isArray(markup)) {
             markups.push(...markup);
           } else {
@@ -104,6 +107,66 @@ export class Component {
   public get rawComponentInfo() {
     return this.componentInfo.rawComponentInfo;
   }
+  // 定义四个角标的尺寸
+  cornerSize = 8;
+
+  // 定义四个角标的markup
+  public getCornerMarkup(width: number, height: number): any[] {
+    const initCoordinateSystem = this.componentInfo?.rawComponentInfo
+      ?.coordinateSystem?.extent || [
+      [-100, -100],
+      [100, 100]
+    ];
+    const [start, end] = initCoordinateSystem;
+    const x = (start[0] + end[0]) / 4;
+    const y = (start[1] + end[1]) / 4;
+    return [
+      {
+        tagName: 'rect',
+        selector: 'top-left-corner',
+        groupSelector: 'node-corner',
+        attrs: {
+          width: this.cornerSize,
+          height: this.cornerSize,
+          x: x - (width + this.cornerSize) / 2,
+          y: y - (height + this.cornerSize) / 2
+        }
+      },
+      {
+        tagName: 'rect',
+        selector: 'top-right-corner',
+        groupSelector: 'node-corner',
+        attrs: {
+          width: this.cornerSize,
+          height: this.cornerSize,
+          x: x - (width + this.cornerSize) / 2 + width,
+          y: y - (height + this.cornerSize) / 2
+        }
+      },
+      {
+        tagName: 'rect',
+        selector: 'bottom-left-corner',
+        groupSelector: 'node-corner',
+        attrs: {
+          width: this.cornerSize,
+          height: this.cornerSize,
+          x: x - (width + this.cornerSize) / 2,
+          y: y - (height + this.cornerSize) / 2 + height
+        }
+      },
+      {
+        tagName: 'rect',
+        selector: 'bottom-right-corner',
+        groupSelector: 'node-corner',
+        attrs: {
+          width: this.cornerSize,
+          height: this.cornerSize,
+          x: x - (width + this.cornerSize) / 2 + width,
+          y: y - (height + this.cornerSize) / 2 + height
+        }
+      }
+    ];
+  }
 
   /**
    * @description: 创建 node
@@ -112,12 +175,12 @@ export class Component {
   public createNode() {
     // 重要 中心点偏移量作为计算位置
     const position = this.getNodePosition();
-    const markup = this.getMarkUp();
-    const width = this.componentInfo.width;
-    const height = this.componentInfo.height;
+    const { width, height } = this.componentInfo;
+    const markup = this.getMarkUp() as any[];
     const id = this.getComponentId();
     const data = this.getData();
-    const node = this.graph.createNode({
+    // 有markup障碍物边界显示不对
+    const item = {
       id,
       x: position.x,
       y: position.y,
@@ -125,8 +188,18 @@ export class Component {
       height,
       markup,
       data,
-      zIndex: this.zIndex
-    });
+      zIndex: this.zIndex,
+      attrs: {
+        'node-corner': {
+          fill: 'transparent',
+          stroke: 'transparent'
+        }
+      }
+    };
+    if (this.componentType === ViewType.Diagram) {
+      item.markup.push(...this.getCornerMarkup(width, height));
+    }
+    const node = this.graph.createNode(item);
     if (this.componentType === ViewType.Icon) {
       const rotation = this.parentComponent?.componentInfo.rotation || 0;
       const center = this.parentComponent?.componentInfo.getViewCenter();

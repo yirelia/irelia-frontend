@@ -1,4 +1,5 @@
-import type { DiagramComponent, Point } from '../../model-gui/model';
+import type { Point } from '@/utils/simulation/model-gui/model';
+import type { GraphCell } from '@/views/simulation/model/components/graphics/type';
 import { Flip, ModelicaClasses } from '../enums';
 import { getBigNumerIntance, toNum, toPoint } from '../utils';
 const BigNumber = getBigNumerIntance();
@@ -31,11 +32,11 @@ export class ComponentInfo {
 
   private viewScale = 1;
 
-  public rawComponentInfo!: DiagramComponent;
+  public rawComponentInfo!: GraphCell;
 
   public isConnector = false;
 
-  constructor(viewScale = 1, componentInfo?: DiagramComponent) {
+  constructor(viewScale = 1, componentInfo?: GraphCell) {
     // 优先初始化
     this.viewScale = viewScale;
     if (componentInfo) {
@@ -43,37 +44,41 @@ export class ComponentInfo {
     }
   }
 
-  public updateComponentInfo(componentInfo: DiagramComponent) {
+  public updateComponentInfo(componentInfo: GraphCell) {
     this.rawComponentInfo = componentInfo;
-    this.extent1Diagram = toPoint(
-      componentInfo.extent1Diagram,
-      this.viewScale,
-      this.viewScale
-    );
+    if (componentInfo.extents && componentInfo.extents.length) {
+      this.extent1Diagram = toPoint(
+        componentInfo.extents[0],
+        this.viewScale,
+        this.viewScale
+      );
 
-    this.extent2Diagram = toPoint(
-      componentInfo.extent2Diagram,
-      this.viewScale,
-      this.viewScale
-    );
+      this.extent2Diagram = toPoint(
+        componentInfo.extents[1],
+        this.viewScale,
+        this.viewScale
+      );
+    }
 
-    this.originDiagram = toPoint(
-      componentInfo.originDiagram,
-      this.viewScale,
-      this.viewScale
-    );
+    if (componentInfo.origin) {
+      this.originDiagram = toPoint(
+        componentInfo.origin,
+        this.viewScale,
+        this.viewScale
+      );
+    }
     // 重要坐标系角度转换
     this.rotation = -toNum(componentInfo.rotation);
 
     this.width = Math.abs(this.extent1Diagram.x - this.extent2Diagram.x);
     this.height = Math.abs(this.extent1Diagram.y - this.extent2Diagram.y);
     const viewCenter = this.getViewCenter();
-    // 中心店才是 node 节点便宜量
+    // 中心点才是 node 节点偏移量
     this.x = viewCenter.x;
     this.y = viewCenter.y;
     this.isConnector =
-      componentInfo.graphType === ModelicaClasses.ExpandableConnector ||
-      componentInfo.graphType === ModelicaClasses.Connector;
+      componentInfo.restriction === ModelicaClasses.ExpandableConnector ||
+      componentInfo.restriction === ModelicaClasses.Connector;
     this.name = this.rawComponentInfo.name;
   }
 
@@ -130,37 +135,46 @@ export class ComponentInfo {
   }
 
   public getMagnetShape() {
-    const extent1Diagram = this.geteExtentDiagram('extent1_diagram');
-    const extent2Diagram = this.geteExtentDiagram('extent2_diagram');
+    const [extent1Diagram, extent2Diagram] = this.geteExtentDiagram();
     return {
-      borderPattern: '',
-      color: '0,0,0,0',
-      extentsPoints: [extent1Diagram.join(), extent2Diagram.join()],
-      fillColor: '255,255,255,0',
-      fillPattern: 'FillPattern.None',
-      linePattern: 'LinePattern.None',
-      lineThickness: '0.25',
+      extentsPoints: [extent1Diagram, extent2Diagram],
+      fillColor: [255, 255, 255],
+      fillPattern: {
+        name: 'FillPattern.None',
+        index: 1,
+        kind: 'enum'
+      },
+      linePattern: {
+        name: 'LinePattern.None',
+        index: 1,
+        kind: 'enum'
+      },
+      thickness: 0.25,
       type: 'Rectangle',
-      visible: 'true',
-      originalPoint: '0.0,0.0',
-      radius: '0',
-      rotation: '0',
+      visible: true,
+      borderRadius: 0,
+      rotation: 0,
       points: [],
-      smooth: '',
-      polygonPoints: [],
-      imageBase64: '',
-      textType: '',
-      originalTextString: '',
-      diagram: false,
-      mobility: undefined,
-      arrow: 'Arrow.Open',
+      textString: '',
+      mobility: false,
+      arrow: [
+        {
+          index: 1,
+          kind: 'enum',
+          name: 'Arrow.None'
+        }
+      ],
       magnet: this.isConnector
     };
   }
 
-  public geteExtentDiagram(key: string) {
-    return this.rawComponentInfo.parent
-      ? this.rawComponentInfo.coordinate_system[key]
-      : this.rawComponentInfo.coordinate_system[key].map(item => item * 0.2);
+  public geteExtentDiagram() {
+    const extent = this.rawComponentInfo.coordinateSystem?.extent ?? [
+      [0, 0],
+      [0, 0]
+    ];
+    return this.rawComponentInfo.parentName
+      ? extent
+      : extent.map(item => item.map(it => it * 0.2));
   }
 }
