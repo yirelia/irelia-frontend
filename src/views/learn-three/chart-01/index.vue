@@ -1,5 +1,15 @@
 <template>
     <div class="flight-wp" ref="domRef">
+
+        <div class="flight-info">
+            <el-descriptions :column="1">
+                <el-descriptions-item label="偏航角">{{ yaw.toFixed(2) }}</el-descriptions-item>
+                <el-descriptions-item label="俯仰角">{{ pictch.toFixed(2) }}</el-descriptions-item>
+                <el-descriptions-item label="翻滚角">{{ roll.toFixed(2) }}</el-descriptions-item>
+                <el-descriptions-item label="坐标">{{
+                    position }}</el-descriptions-item>
+            </el-descriptions>
+        </div>
     </div>
 </template>
 <script lang='ts' setup>
@@ -7,16 +17,23 @@
     import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
     // 相机控件
     import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-    import { onMounted, ref } from "vue";
+    import { computed, onMounted, ref } from "vue";
     import { useDirectionLight } from "./directlight.hook";
     import { useCatmullRomCurve3 } from "./three.hooks";
     import { Matrix4 } from "three";
 
-    const planePosition = new THREE.Vector3(-10, 10, 0)
+    const planePosition = ref(new THREE.Vector3(0, 0, 0))
 
-    let yaw = 0 // 
-    let pictch = 0
-    let roll = 0
+    const position = computed(() => {
+
+        return `x: ${planePosition.value.x.toFixed(2)} y:${planePosition.value.y.toFixed(2)} z: ${planePosition.value.z.toFixed(2)}`
+    })
+
+    let yaw = ref(0) // 
+    let pictch = ref(0)
+    let roll = ref(0)
+
+
 
     let i = 0
     const helixRef = ref<THREE.Object3D>()
@@ -63,7 +80,7 @@
         plane.castShadow = true;
         plane.receiveShadow = true;
         plane.rotation.x = -0.5 * Math.PI;
-        plane.position.set(10, -100, 0);
+        plane.position.set(10, -10, 0);
         scene.add(plane);
         // 添加灯光
         const { directionLight } = useDirectionLight()
@@ -72,33 +89,32 @@
         function render() {
             if (planeRef.value) {
                 if (Keys['a']) {
-                    roll += 0.01
+                    roll.value += 0.01
                 }
                 if (Keys['d']) {
-                    roll -= 0.01
+                    roll.value -= 0.01
                 }
 
                 if (Keys['w']) {
-                    pictch += 0.01
+                    pictch.value += 0.01
                 }
                 if (Keys['s']) {
-                    pictch -= 0.01
+                    pictch.value -= 0.01
                 }
                 if (Keys['q']) {
-                    yaw += 0.01
+                    yaw.value += 0.01
                 }
                 if (Keys['e']) {
-                    yaw -= 0.01
+                    yaw.value -= 0.01
                 }
-                let position = new THREE.Vector3()
                 if (i < points.length) {
-                    position = points[i]
+                    planePosition.value = points[i]
                     i++
                 } else {
                     i = 0
                 }
-                const rotationMatrix = new Matrix4().makeRotationFromEuler(new THREE.Euler(roll, yaw, pictch, 'ZYX'))
-                const translationMatrix = new Matrix4().makeTranslation(position.x, position.y, position.z)
+                const rotationMatrix = new Matrix4().makeRotationFromEuler(new THREE.Euler(roll.value, yaw.value, pictch.value, 'ZYX'))
+                const translationMatrix = new Matrix4().makeTranslation(planePosition.value.x, planePosition.value.y, planePosition.value.z)
                 const matrix = new Matrix4().multiply(translationMatrix).multiply(rotationMatrix)
 
                 console.log(matrix)
@@ -151,5 +167,13 @@
 .flight-wp {
     height: 100%;
     width: 100%;
+    position: relative;
+}
+
+.flight-info {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    width: 400px;
 }
 </style>
