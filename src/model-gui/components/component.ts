@@ -114,9 +114,9 @@ export class Component {
   public getCornerMarkup(width: number, height: number): any[] {
     const initCoordinateSystem = this.componentInfo?.rawComponentInfo
       ?.coordinateSystem?.extent || [
-      [-100, -100],
-      [100, 100]
-    ];
+        [-100, -100],
+        [100, 100]
+      ];
     const [start, end] = initCoordinateSystem;
     const x = (start[0] + end[0]) / 4;
     const y = (start[1] + end[1]) / 4;
@@ -236,9 +236,8 @@ export class Component {
   public getComponentId(): string {
     return this.componentType === ViewType.Diagram
       ? this.componentInfo.name
-      : `${this.parentComponent!.componentInfo.name}.${
-          this.componentInfo.name
-        }`;
+      : `${this.parentComponent!.componentInfo.name}_${this.componentInfo.name
+      }`;
   }
 
   public getData() {

@@ -47,7 +47,7 @@ export class ComponentEdge {
     this.stroke = `rgb(${this.edge.color || [0, 0, 127]})`;
     this.strokeDasharray =
       this.edge.linePattern &&
-      this.edge.linePattern?.name !== 'LinePattern.Solid'
+        this.edge.linePattern?.name !== 'LinePattern.Solid'
         ? 5
         : 0;
   }
@@ -57,8 +57,8 @@ export class ComponentEdge {
    * @return {*}
    */
   public addEdge(isBatch = false) {
-    let sourceId = map(this.edge.lhs, 'name').join('.');
-    let targetId = map(this.edge.rhs, 'name').join('.');
+    let sourceId = map(this.edge.lhs, 'name').join('_');
+    let targetId = map(this.edge.rhs, 'name').join('_');
     const vertices = this.extentPoints;
     let sourceCell = this.graph.getCellById(sourceId);
     if (!sourceCell) {
