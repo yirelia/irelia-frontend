@@ -6,9 +6,12 @@
 <script setup lang="ts">
   import { Graph, Node } from "@antv/x6";
   import { onMounted, ref } from "vue";
+  // import res from './res1.json'
   import res from './res.json'
+  // import res1 from './res1.json'
   import { Component, ComponentEdge, ViewType } from '@/model-gui'
   import ELK from 'elkjs';
+  import { HelixCurve } from "three/examples/jsm/curves/CurveExtras.js";
 
   const x6Ref = ref();
   console.log(res)
@@ -70,9 +73,15 @@
     const elk = new ELK()
     const elkGraph = {
       id: "root",
+      width: 100,
+      height: 100,
       layoutOptions: {
+        "algorithm": "layered",
         // 'elk.algorithm': 'force',
         logging: true,
+        "spacing.nodeNode": "10",
+        "spacing.edgeNode": "10",
+        // "spacing.nodeNodeBetweenLayers": "1"
       },
       children: nodeIds.map(id => {
         const node = graph.getCellById(id)! as Node
@@ -95,8 +104,8 @@
 
           return {
             id: child.id,
-            width: size!.width,
-            height: size!.height,
+            width: size!.width / 5,
+            height: size!.height / 5,
             "properties": {
               "port.side": portSide,
             },
@@ -135,8 +144,29 @@
       console.log(res)
       graph.clearCells()
       res.children?.forEach((child) => {
-        nodesMap.get(child.id)!.origin = [child.x / 2, -child.y / 2]
+        // console.log(`child ${child.id} position`, child.x, child.y);
+        // const centerX = (child.x - child.width) / 2
+        // const centerY = (child.y - child.height) / 2
+        const node = nodesMap.get(child.id)!
+        const item = new Component(graph, structuredClone(node))
+        const { x, y } = item.componentInfo.center
+        node.origin = [(child.x - x) / 5, -(child.y - y) / 5]
+        // graph.addNode({
+        //   id: child.id,
+        //   x: centerX,
+        //   y: centerY,
+        //   // position: {
+        //   //   x: child.x,
+        //   //   y: child.y
+        //   // },
+        //   size: {
+        //     width: child.width,
+        //     height: child.height
+        //   }
+        // })
       })
+
+
 
       nodes.map(el => {
         const compt = new Component(graph, el)
@@ -151,18 +181,18 @@
 
       connections.forEach(el => {
         const edge = new ComponentEdge(graph, el).addEdge()
-        // if (edge) {
-        //   const id = edge.id
-        //   const source = edge.getSourceCellId()
-        //   const target = edge.getTargetCellId()
-        //   const e = {
-        //     id: edge.id,
-        //     sources: [source],
-        //     targets: [target]
-        //   }
-        //   edges.push(e)
-        //   graph.removeEdge(edge)
-        // }
+        if (edge) {
+          const id = edge.id
+          const source = edge.getSourceCellId()
+          const target = edge.getTargetCellId()
+          const e = {
+            id: edge.id,
+            sources: [source],
+            targets: [target]
+          }
+          // edges.push(e)
+          // graph.removeEdge(edge)
+        }
 
       })
       graph.centerContent()
