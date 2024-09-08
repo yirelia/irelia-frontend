@@ -5,23 +5,6 @@ export abstract class Command {
     abstract redo(): void;
 }
 
-export class OpenCommand extends Command {
-
-    constructor() {
-        super()
-    }
-    execute(): void {
-        console.log('Open command executed');
-    }
-    undo(): void {
-        console.log('Open command undo');
-    }
-
-    redo(): void {
-        console.log('Open command redo');
-    }
-}
-
 export class SaveCommand extends Command {
     execute(): void {
         console.log('Save command executed');
@@ -34,14 +17,34 @@ export class SaveCommand extends Command {
     }
 }
 
-export class History {
-    private commands: Command[] = [];
+export class AddCommand extends Command {
+    execute(): void {
+        console.log('Add command executed');
+    }
+    undo(): void {
+        console.log('Add command undo');
+    }
+    redo(): void {
+        console.log('Add command redo');
+    }
+}
 
+export class History {
+    protected redoStack: Command[] = []
+    protected undoStack: Command[] = []
     push(command: Command) {
-        this.commands.push(command);
+        this.undoStack.push(command);
     }
 
-    pop() {
-        return this.commands.pop();
+    execute(revert: boolean = false) {
+        if (revert) {
+            this.redoStack.shift()?.redo();
+        } else {
+            const command = this.undoStack.pop()
+            if (command) {
+                command?.undo();
+                this.redoStack.unshift(command);
+            }
+        }
     }
 }
