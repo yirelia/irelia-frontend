@@ -23,6 +23,13 @@ export const routes = [
     component: () => import("@/views/3D/index.vue"),
   },
   {
+    path: "/grain",
+    meta: {
+      name: "粒子系统测试",
+    },
+    component: () => import("@/views/3D/grain.vue"),
+  },
+  {
     path: "/2d",
     meta: {
       name: "svg路径动画",
