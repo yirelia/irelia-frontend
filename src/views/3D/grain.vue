@@ -4,22 +4,40 @@
 
 <script lang="ts" setup>
     import { ref, onMounted, onUnmounted } from 'vue';
-    import { PerspectiveCamera, Scene, DirectionalLight, WebGLRenderer, Mesh, BoxGeometry, MeshBasicMaterial, Color, CatmullRomCurve3, Vector3, BufferGeometry, BufferAttribute, PointsMaterial, Points, AxesHelper } from 'three';
+    import * as THREE from 'three';
+    import {
+        PerspectiveCamera, Scene, DirectionalLight, WebGLRenderer,
+        Mesh,
+        BoxGeometry,
+        MeshBasicMaterial,
+        Color, CatmullRomCurve3,
+        Vector3,
+        BufferGeometry,
+        BufferAttribute,
+        PointsMaterial,
+        Points,
+        AxesHelper,
+        LineCurve3,
+        CurvePath,
+        TubeGeometry,
+        Curve
+    } from 'three';
     import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
     import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
     const container = ref<HTMLDivElement>();
 
     let camera: PerspectiveCamera, scene: Scene, renderer: WebGLRenderer, controls: OrbitControls;
-    let particleSystem: Points, particleGeometry: BufferGeometry, path: CatmullRomCurve3;
-    let particlePositions: Float32Array, particleCount = 1000;
-    let particleSpeed = 0.001, particleOffset = 0;
+    let particleSystem: Points, particleSystem2: Points, particleGeometry: BufferGeometry, particleGeometry2: BufferGeometry
+    curve: CatmullRomCurve3;
+
+    let particleSpeed = 1, particleOffset = 10;
     onMounted(() => {
         // 初始化相机
         camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         // camera.position.z = 5;
 
-        camera.position.set(10, 10, 10);
+        camera.position.set(0, 0, 50);
 
         // 初始化场景
         scene = new Scene();
@@ -36,104 +54,119 @@
         // 初始化轨道控制
         controls = new OrbitControls(camera, renderer.domElement);
 
-        // 添加平行光
-        const directionalLight = new DirectionalLight(0xffffff, 1); // 白色光，强度为1
-        directionalLight.position.set(10, 10, 10); // 设置光源位置
-        scene.add(directionalLight);
 
+        // // 添加平行光
+        // const directionalLight = new DirectionalLight(0xffffff, 1); // 白色光，强度为1
+        // directionalLight.position.set(10, 10, 10); // 设置光源位置
+        // scene.add(directionalLight);
 
-        // 添加坐标轴
-        const axesHelper = new AxesHelper(5); // 参数为坐标轴的长度
-        scene.add(axesHelper);
+        // 定义 Z 型管道的控制点
+        const points = [
+            new Vector3(-20, 20, 0),
+            new Vector3(0, 20, 0),
+            new Vector3(0, 0, 0),
+            new Vector3(20, 0, 0),
+        ];
 
-        // 加载 GLTF 模型
-        const loader = new GLTFLoader();
-        loader.load('/assets/models/tube.glb', (gltf: any) => {
-            scene.add(gltf.scene);
-            scene.updateMatrixWorld(true)
-            // const worldPosition = gltf.scene.getWorldPosition()
-            // console.log(`worldPositio`, worldPosition)
-            console.log(`旋转角度 ${gltf.scene.rotation.x} ${gltf.scene.rotation.y} ${gltf.scene.rotation.z}`);
-            // 提取路径
-            const pathPoints: Vector3[] = [];
-            console.log(`scene geometry`, gltf.scene.geometry)
-            let num = 0
-            gltf.scene.traverse((child: any) => {
-                if (child.isMesh) {
-                    child.material.transparent = true;
-                    child.material.opacity = 0.2;
-                    const geometry = child.geometry;
-                    // child.rotation.x = 0
+        const points1 = [
+            new Vector3(-20, 21, 0),
+            new Vector3(0, 21, 0),
+            new Vector3(0, 0, 0),
+            new Vector3(20, 1, 0),
+        ];
 
-
-                    const positionAttribute = geometry.attributes.position;
-                    console.log(`positionAttribute ${num++}`, positionAttribute)
-                    for (let i = 0; i < positionAttribute.count; i++) {
-                        // const 
-                        // const x = positionAttribute.getX(i);
-                        // const y = positionAttribute.getY(i);
-                        // const z = positionAttribute.getZ(i);
-                        // pathPoints.push(new Vector3(x, y, z));
-                        const localVertex = new Vector3();
-                        localVertex.fromBufferAttribute(positionAttribute, i);
-                        console.log(`localVertex`, localVertex)
-                        const worldVertex = child.localToWorld(localVertex);
-                        pathPoints.push(worldVertex);
-                    }
-                }
-            });
-
-            // const sortedPathPoints = pathPoints.sort((a, b) => a.x - b.x || a.y - b.y || a.z - b.z);
-            path = new CatmullRomCurve3(pathPoints);
-            createParticleSystem(path);
-        });
-
-        // 创建粒子系统
-        const createParticleSystem = (path: CatmullRomCurve3) => {
-            const particles = new Float32Array(particleCount * 3);
-            const tubeLength = path.getLength();
-
-            for (let i = 0; i < particleCount; i++) {
-                const t = (i / particleCount) * tubeLength;
-                const point = path.getPointAt(t / tubeLength);
-                particles[i * 3] = point.x;
-                particles[i * 3 + 1] = point.y;
-                particles[i * 3 + 2] = point.z;
-            }
-
-            const particleGeometry = new BufferGeometry();
-            particleGeometry.setAttribute('position', new BufferAttribute(particles, 3));
-
-            const particleMaterial = new PointsMaterial({ color: 0xff0000, size: 0.1 });
+        const points2 = [
+            new Vector3(-20, 19, 0),
+            new Vector3(0, 19, 0),
+            new Vector3(-1, -1, 0),
+            new Vector3(20, -1, 0),
+        ];
+        // const particleMaterial1 = new PointsMaterial({ color: 0xff0000, size: 0.1 });
+        // const particleMaterial2 = new PointsMaterial({ color: 0xff0000, size: 0.1 });
+        let particlePositions1: Float32Array, particlePositions2: Float32Array, particleCount = 2;
+        const createParticleSystem1 = () => {
+            particlePositions1 = new Float32Array(particleCount * 3);
+            particleGeometry = new BufferGeometry();
+            particleGeometry.setAttribute('position', new THREE.BufferAttribute(particlePositions1, 3));
+            const particleMaterial = new PointsMaterial({ color: 0xff0000, size: 0.4 });
             particleSystem = new Points(particleGeometry, particleMaterial);
             scene.add(particleSystem);
         };
+        const createParticleSystem2 = () => {
+            particlePositions2 = new Float32Array(particleCount * 3);
+            particleGeometry2 = new BufferGeometry();
+            particleGeometry2.setAttribute('position', new THREE.BufferAttribute(particlePositions2, 3));
+            const particleMaterial = new PointsMaterial({ color: 0x0000ff, size: 0.4 });
+            particleSystem2 = new Points(particleGeometry2, particleMaterial);
+            scene.add(particleSystem2);
+        };
+
+
+        const curve1 = new CatmullRomCurve3(points1);
+        const curve2 = new CatmullRomCurve3(points2);
+
+
+
+        const updateParticles1 = (curve1) => {
+            for (let i = 0; i < particleCount; i++) {
+                // const t = (i / particleCount + particleOffset) % 1;
+                const t = Math.random();
+                const point = curve1.getPointAt(t);
+                console.log(`t `, t, point)
+                particlePositions1[i * 3] = point.x;
+                particlePositions1[i * 3 + 1] = point.y;
+                particlePositions1[i * 3 + 2] = point.z;
+            }
+            particleOffset += particleSpeed;
+            // console.log(particleOffset)
+            // particlePositions1[0] = 
+            particleGeometry.attributes.position.needsUpdate = true;
+        };
+
+        const updateParticles2 = (curve2) => {
+            for (let i = 0; i < particleCount; i++) {
+                // const t = (i / particleCount + particleOffset) % 1;
+                const t = Math.random();
+                const point = curve2.getPointAt(t);
+                console.log(`point `, point)
+                particlePositions2[i * 3] = point.x;
+                particlePositions2[i * 3 + 1] = point.y;
+                particlePositions2[i * 3 + 2] = point.z;
+            }
+            particleOffset += particleSpeed;
+            particleGeometry2.attributes.position.needsUpdate = true;
+        };
+        createParticleSystem1()
+        createParticleSystem2()
+
+
+
+        // 创建 CatmullRomCurve3 曲线
+        const curve = new CatmullRomCurve3(points);
+        const geometry = new TubeGeometry(curve, 64, 2, 8);
+        const material = new MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.2 });
+        const tube = new Mesh(geometry, material);
+        // tube.geometry.setAttribute()
+        scene.add(tube);
+
+        new THREE.Points()
+        // 添加坐标轴
+        const axesHelper = new AxesHelper(100); // 参数为坐标轴的长度
+        scene.add(axesHelper);
 
         // 渲染循环
         const animate = () => {
             requestAnimationFrame(animate);
             controls.update();
-            // updateParticles();
+            updateParticles1(curve1)
+            // updateParticles2(curve2)
             renderer.render(scene, camera);
         };
         animate();
+        // const 
 
-        // 更新粒子位置
-        function updateParticles() {
-            if (path) {
-                const tubeLength = path.getLength();
-                for (let i = 0; i < tubeLength - 1; i++) {
-                    const t = (i / 10 + particleOffset) % 1;
-                    const point = path.getPointAt(t);
-                    particlePositions[i * 3] = point.x;
-                    particlePositions[i * 3 + 1] = point.y;
-                    particlePositions[i * 3 + 2] = point.z;
-                }
-                particleOffset += particleSpeed;
-                particleGeometry.attributes.position.needsUpdate = true;
-            }
 
-        };
+
 
         // 处理窗口大小调整
         window.addEventListener('resize', onWindowResize);
