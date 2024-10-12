@@ -31,7 +31,7 @@
     let particleSystem: Points, particleSystem2: Points, particleGeometry: BufferGeometry, particleGeometry2: BufferGeometry
     curve: CatmullRomCurve3;
 
-    let particleSpeed = 1, particleOffset = 10;
+    let particleSpeed = 0.0008, particleOffset = 1;
     onMounted(() => {
         // 初始化相机
         camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -54,12 +54,6 @@
         // 初始化轨道控制
         controls = new OrbitControls(camera, renderer.domElement);
 
-
-        // // 添加平行光
-        // const directionalLight = new DirectionalLight(0xffffff, 1); // 白色光，强度为1
-        // directionalLight.position.set(10, 10, 10); // 设置光源位置
-        // scene.add(directionalLight);
-
         // 定义 Z 型管道的控制点
         const points = [
             new Vector3(-20, 20, 0),
@@ -76,65 +70,81 @@
         ];
 
         const points2 = [
-            new Vector3(-20, 19, 0),
-            new Vector3(0, 19, 0),
+            new Vector3(-20, 18.5, 0),
+            new Vector3(0, 18.5, 0),
             new Vector3(-1, -1, 0),
             new Vector3(20, -1, 0),
         ];
-        // const particleMaterial1 = new PointsMaterial({ color: 0xff0000, size: 0.1 });
-        // const particleMaterial2 = new PointsMaterial({ color: 0xff0000, size: 0.1 });
-        let particlePositions1: Float32Array, particlePositions2: Float32Array, particleCount = 2;
+        const curve1 = new CatmullRomCurve3(points1);
+        const curve2 = new CatmullRomCurve3(points2);
+        let particlePositions1: Float32Array, particlePositions2: Float32Array, particleCount = 60;
+        let particleColors1: Float32Array
+        let particleColors2: Float32Array
         const createParticleSystem1 = () => {
+            const point = curve1.getPointAt(0);
             particlePositions1 = new Float32Array(particleCount * 3);
+            particleColors1 = new Float32Array(particleCount * 3);
+            // for (let i = 0; i < particleCount; i++) {
+            //     const point = linePoints[i]
+            //     particlePositions1[i * 3] = point.x;
+            //     particlePositions1[i * 3 + 1] = point.y;
+            //     particlePositions1[i * 3 + 2] = point.z;
+
+            //     const color = new Color();
+            //     color.setHSL(i, 1.0, 0.5); // 使用 HSL 颜色模型，根据 t 值设置颜色
+            //     particleColors1[i * 3] = color.r;
+            //     particleColors1[i * 3 + 1] = color.g;
+            //     particleColors1[i * 3 + 2] = color.b;
+            // }
+
             particleGeometry = new BufferGeometry();
             particleGeometry.setAttribute('position', new THREE.BufferAttribute(particlePositions1, 3));
-            const particleMaterial = new PointsMaterial({ color: 0xff0000, size: 0.4 });
+            particleGeometry.setAttribute('color', new THREE.BufferAttribute(particleColors1, 3));
+            const particleMaterial = new PointsMaterial({ vertexColors: true, size: 0.4 });
             particleSystem = new Points(particleGeometry, particleMaterial);
             scene.add(particleSystem);
         };
         const createParticleSystem2 = () => {
             particlePositions2 = new Float32Array(particleCount * 3);
+            particleColors2 = new Float32Array(particleCount * 3);
             particleGeometry2 = new BufferGeometry();
             particleGeometry2.setAttribute('position', new THREE.BufferAttribute(particlePositions2, 3));
+            particleGeometry2.setAttribute('color', new THREE.BufferAttribute(particleColors2, 3));
             const particleMaterial = new PointsMaterial({ color: 0x0000ff, size: 0.4 });
             particleSystem2 = new Points(particleGeometry2, particleMaterial);
             scene.add(particleSystem2);
         };
 
 
-        const curve1 = new CatmullRomCurve3(points1);
-        const curve2 = new CatmullRomCurve3(points2);
 
-
-
+        const linePoints = curve1.getPoints(particleCount)
+        console.log(`line points`, linePoints)
         const updateParticles1 = (curve1) => {
             for (let i = 0; i < particleCount; i++) {
-                // const t = (i / particleCount + particleOffset) % 1;
-                const t = Math.random();
+                console.log(`value is `, i / particleCount + particleOffset)
+                const t = (i / particleCount + particleOffset) % 1;
                 const point = curve1.getPointAt(t);
-                console.log(`t `, t, point)
                 particlePositions1[i * 3] = point.x;
                 particlePositions1[i * 3 + 1] = point.y;
                 particlePositions1[i * 3 + 2] = point.z;
             }
             particleOffset += particleSpeed;
-            // console.log(particleOffset)
-            // particlePositions1[0] = 
             particleGeometry.attributes.position.needsUpdate = true;
+            particleGeometry.attributes.color.needsUpdate = true
         };
 
         const updateParticles2 = (curve2) => {
             for (let i = 0; i < particleCount; i++) {
-                // const t = (i / particleCount + particleOffset) % 1;
-                const t = Math.random();
+                console.log(`value is `, i / particleCount + particleOffset)
+                const t = (i / particleCount + particleOffset) % 1;
                 const point = curve2.getPointAt(t);
-                console.log(`point `, point)
                 particlePositions2[i * 3] = point.x;
                 particlePositions2[i * 3 + 1] = point.y;
                 particlePositions2[i * 3 + 2] = point.z;
             }
             particleOffset += particleSpeed;
             particleGeometry2.attributes.position.needsUpdate = true;
+            particleGeometry2.attributes.color.needsUpdate = true
         };
         createParticleSystem1()
         createParticleSystem2()
@@ -144,26 +154,24 @@
         // 创建 CatmullRomCurve3 曲线
         const curve = new CatmullRomCurve3(points);
         const geometry = new TubeGeometry(curve, 64, 2, 8);
-        const material = new MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.2 });
+        const material = new MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.4 });
         const tube = new Mesh(geometry, material);
-        // tube.geometry.setAttribute()
         scene.add(tube);
-
-        new THREE.Points()
         // 添加坐标轴
         const axesHelper = new AxesHelper(100); // 参数为坐标轴的长度
         scene.add(axesHelper);
+
+
 
         // 渲染循环
         const animate = () => {
             requestAnimationFrame(animate);
             controls.update();
             updateParticles1(curve1)
-            // updateParticles2(curve2)
+            updateParticles2(curve2)
             renderer.render(scene, camera);
         };
         animate();
-        // const 
 
 
 

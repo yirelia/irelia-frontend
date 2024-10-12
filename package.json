@@ -13,6 +13,7 @@
     "@antv/x6-plugin-selection": "^2.2.2",
     "@antv/x6-plugin-snapline": "^2.1.7",
     "@antv/x6-vue-shape": "^2.1.2",
+    "@tweenjs/tween.js": "^25.0.0",
     "@types/node": "^20.6.0",
     "axios": "^1.6.0",
     "bignumber.js": "^9.0.1",
