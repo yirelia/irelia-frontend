@@ -100,7 +100,7 @@
             particleGeometry = new BufferGeometry();
             particleGeometry.setAttribute('position', new THREE.BufferAttribute(particlePositions1, 3));
             particleGeometry.setAttribute('color', new THREE.BufferAttribute(particleColors1, 3));
-            const particleMaterial = new PointsMaterial({ vertexColors: true, size: 0.4 });
+            const particleMaterial = new PointsMaterial({ vertexColors: true, size: 0.6 });
             particleSystem = new Points(particleGeometry, particleMaterial);
             scene.add(particleSystem);
         };
