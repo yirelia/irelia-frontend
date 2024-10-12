@@ -24,6 +24,7 @@
     } from 'three';
     import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
     import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+    import { useSpeed } from './dat.hook';
 
     const container = ref<HTMLDivElement>();
 
@@ -31,7 +32,8 @@
     let particleSystem: Points, particleSystem2: Points, particleGeometry: BufferGeometry, particleGeometry2: BufferGeometry
     curve: CatmullRomCurve3;
 
-    let particleSpeed = 0.0008, particleOffset = 1;
+    let particleSpeed = ref(0.0008), particleOffset = 1;
+    useSpeed(particleSpeed)
     onMounted(() => {
         // 初始化相机
         camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -128,7 +130,7 @@
                 particlePositions1[i * 3 + 1] = point.y;
                 particlePositions1[i * 3 + 2] = point.z;
             }
-            particleOffset += particleSpeed;
+            particleOffset += particleSpeed.value;
             particleGeometry.attributes.position.needsUpdate = true;
             particleGeometry.attributes.color.needsUpdate = true
         };
@@ -142,7 +144,7 @@
                 particlePositions2[i * 3 + 1] = point.y;
                 particlePositions2[i * 3 + 2] = point.z;
             }
-            particleOffset += particleSpeed;
+            particleOffset += particleSpeed.value;
             particleGeometry2.attributes.position.needsUpdate = true;
             particleGeometry2.attributes.color.needsUpdate = true
         };
