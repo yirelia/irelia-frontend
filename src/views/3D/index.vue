@@ -25,6 +25,7 @@
     import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
     import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
     import { useSpeed } from './dat.hook';
+    import { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
     const container = ref<HTMLDivElement>();
 
@@ -123,7 +124,6 @@
         console.log(`line points`, linePoints)
         const updateParticles1 = (curve1) => {
             for (let i = 0; i < particleCount; i++) {
-                console.log(`value is `, i / particleCount + particleOffset)
                 const t = (i / particleCount + particleOffset) % 1;
                 const point = curve1.getPointAt(t);
                 particlePositions1[i * 3] = point.x;
@@ -137,7 +137,6 @@
 
         const updateParticles2 = (curve2) => {
             for (let i = 0; i < particleCount; i++) {
-                console.log(`value is `, i / particleCount + particleOffset)
                 const t = (i / particleCount + particleOffset) % 1;
                 const point = curve2.getPointAt(t);
                 particlePositions2[i * 3] = point.x;
@@ -163,8 +162,20 @@
         const axesHelper = new AxesHelper(100); // 参数为坐标轴的长度
         scene.add(axesHelper);
 
-        new GLTFLoader().load('models/scene.gltf', (gltf) => {
-            scene.add(gltf.scene);
+        new GLTFLoader().load('/assets/models/zz.glb', (glb: GLTF) => {
+            scene.add(glb.scene);
+            glb.scene.traverse(child => {
+                console.log(`glb`, child)
+                // if(贝塞尔曲线002) {}
+                const geometry = child?.geometry?.attributes?.position;
+                console.log(geometry)
+                // const positionAttribute = geometry.;
+                // if (child.isMesh) {
+                //     child
+                //     // child.material.transparent = true
+                //     // child.material.opacity = 0.4;
+                // }
+            })
         });
 
         // 渲染循环
