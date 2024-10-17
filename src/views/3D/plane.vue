@@ -3,13 +3,13 @@
     <div class="flight-info">
       <el-descriptions :column="1">
         <el-descriptions-item label="偏航角">{{
-          yaw.toFixed(2)
+          deg(yaw.toFixed(2))
         }}</el-descriptions-item>
         <el-descriptions-item label="俯仰角">{{
-          pictch.toFixed(2)
+          deg(pictch.toFixed(2))
         }}</el-descriptions-item>
         <el-descriptions-item label="翻滚角">{{
-          roll.toFixed(2)
+          deg(roll.toFixed(2))
         }}</el-descriptions-item>
         <el-descriptions-item label="坐标">{{ position }}</el-descriptions-item>
       </el-descriptions>
@@ -35,6 +35,10 @@ const position = computed(() => {
     2
   )}`;
 });
+
+const deg = (rad) => {
+  return THREE.MathUtils.radToDeg(rad).toFixed(2);
+};
 
 let yaw = ref(0); //
 let pictch = ref(0);
