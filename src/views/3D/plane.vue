@@ -28,6 +28,8 @@ import { Matrix4 } from "three";
 
 const planePosition = ref(new THREE.Vector3(0, 0, 0));
 
+let helix = null;
+
 const position = computed(() => {
   return `x: ${planePosition.value.x.toFixed(
     2
@@ -88,8 +90,8 @@ onMounted(() => {
   scene.add(axesHelper);
 
   // 平面
-  const planeGeometry = new THREE.PlaneGeometry(100, 60);
-  const planeMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
+  const planeGeometry = new THREE.PlaneGeometry(200, 100);
+  const planeMaterial = new THREE.MeshLambertMaterial({ color: 0x665757 });
   const plane = new THREE.Mesh(planeGeometry, planeMaterial);
   plane.castShadow = true;
   plane.receiveShadow = true;
@@ -139,7 +141,9 @@ onMounted(() => {
         .multiply(translationMatrix)
         .multiply(rotationMatrix);
 
-      console.log(matrix);
+      helix.rotation.z += 1;
+      console.log(helix);
+      // console.log(matrix);
       // const matrix = new THREE.Matrix4().multiply(position).makeTranslation().makeTranslation(new THREE.Vector3(1, 0, 0)))
       planeRef.value.matrixAutoUpdate = false;
       planeRef.value.matrix.copy(matrix);
@@ -163,6 +167,13 @@ onMounted(() => {
     data.scene.name = "airplane";
     data.scene.position.copy(planePosition);
     renderer.setAnimationLoop(render);
+
+    data.scene.traverse((child) => {
+      console.log(child);
+      if (child.name === "helix") {
+        helix = child;
+      }
+    });
   });
 
   scene.add(curveObject);
