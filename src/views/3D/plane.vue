@@ -25,6 +25,7 @@ import { computed, onMounted, ref } from "vue";
 import { useDirectionLight } from "./directlight.hook";
 import { useCatmullRomCurve3 } from "./three.hooks";
 import { Matrix4 } from "three";
+import { ca } from "element-plus/es/locale/index.mjs";
 
 const planePosition = ref(new THREE.Vector3(0, 0, 0));
 
@@ -47,7 +48,7 @@ let pictch = ref(0);
 let roll = ref(0);
 
 let i = 0;
-const helixRef = ref<THREE.Object3D>();
+// const helixRef = ref<THREE.Object3D>();
 
 const planeRef = ref<THREE.Group<THREE.Object3DEventMap>>();
 
@@ -82,22 +83,27 @@ onMounted(() => {
     0.1,
     1000
   );
-  camera.position.set(50, 90, 90);
-  camera.lookAt(scene.position);
+  camera.lookAt(new THREE.Vector3(-100, 50, 20));
+
+  camera.position.set(41, 46, 81);
+  // camera.rotation.set(-19, -34, -11);
+  // camera.lookAt(new THREE.Vector3(0.958, -0.1539, -0.24065));
   domRef.value?.appendChild(renderer.domElement);
   // 辅助辅助坐标轴
   const axesHelper = new THREE.AxesHelper(20);
   scene.add(axesHelper);
+  // 创建飞机跑道
+  const runwayGeometry = new THREE.PlaneGeometry(200, 20); // 长方形几何体
+  const runwayMaterial = new THREE.MeshBasicMaterial({ color: 0x333333 }); // 深灰色材质
+  const runway = new THREE.Mesh(runwayGeometry, runwayMaterial);
 
-  // 平面
-  const planeGeometry = new THREE.PlaneGeometry(200, 100);
-  const planeMaterial = new THREE.MeshLambertMaterial({ color: 0x665757 });
-  const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-  plane.castShadow = true;
-  plane.receiveShadow = true;
-  plane.rotation.x = -0.5 * Math.PI;
-  plane.position.set(10, -10, 0);
-  scene.add(plane);
+  // 旋转跑道，使其平放在地面上
+  runway.rotation.x = -Math.PI / 2;
+  runway.position.set(100, 0.01, 0); // 稍微抬高跑道以避免Z-fighting
+
+  // 将跑道添加到场景中
+  scene.add(runway);
+
   // 添加灯光
   const { directionLight } = useDirectionLight();
   scene.add(directionLight);
@@ -141,48 +147,65 @@ onMounted(() => {
         .multiply(translationMatrix)
         .multiply(rotationMatrix);
 
-      helix.rotation.z += 1;
-      console.log(helix);
+      // helix.rotation.z += 1;
+      // console.log(helix);
       // console.log(matrix);
       // const matrix = new THREE.Matrix4().multiply(position).makeTranslation().makeTranslation(new THREE.Vector3(1, 0, 0)))
       planeRef.value.matrixAutoUpdate = false;
       planeRef.value.matrix.copy(matrix);
       planeRef.value.matrixWorldNeedsUpdate = true;
+
+      // 更新相机位置和方向，使其跟随飞机
+      // camera.position
+      //   .copy(planeRef.value.position)
+      //   .add(new THREE.Vector3(0, 5, 10)); // 相机在飞机后方上方
+      // camera.lookAt(planeRef.value.position);
     }
 
     renderer.render(scene, camera);
   }
 
-  function genPosition() {
-    const x = Math.random() * 100 - 50;
-    const y = Math.random() * 100 - 50;
-    const z = Math.random() * 100 - 50;
-    return new THREE.Vector3(x, y, z);
-  }
-
   const loader = new GLTFLoader();
-  loader.load("assets/models/zyx.glb", (data) => {
+  loader.load("assets/models/plane-c5-0.1.glb", (data) => {
     planeRef.value = data.scene;
+    planeRef.value.position.set(-200, 0, 0);
     scene.add(data.scene);
     data.scene.name = "airplane";
     data.scene.position.copy(planePosition);
     renderer.setAnimationLoop(render);
-
-    data.scene.traverse((child) => {
-      console.log(child);
-      if (child.name === "helix") {
-        helix = child;
-      }
-    });
   });
 
   scene.add(curveObject);
+  const textureLoader = new THREE.CubeTextureLoader();
+  const texture = textureLoader.load(
+    [
+      "/img/skybox6/posx.jpg", // right
+      "/img/skybox6/negx.jpg", // left
+      "/img/skybox6/posy.jpg", // top
+      "/img/skybox6/negy.jpg", // bottom
+      "/img/skybox6/posz.jpg", // front
+      "/img/skybox6/negz.jpg", // back
+    ],
+    () => {
+      scene.background = texture;
+      renderer.render(scene, camera);
+    }
+  );
 
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.enableZoom = true;
   controls.enablePan = true;
   controls.enabled = true;
   controls.addEventListener("change", () => {
+    const direction = new THREE.Vector3();
+    camera.getWorldDirection(direction);
+
+    console.log(
+      `camera position: `,
+      camera.position,
+      camera.rotation,
+      direction
+    );
     renderer.render(scene, camera);
   });
 
