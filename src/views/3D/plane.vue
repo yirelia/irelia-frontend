@@ -25,11 +25,8 @@ import { computed, onMounted, ref } from "vue";
 import { useDirectionLight } from "./directlight.hook";
 import { useCatmullRomCurve3 } from "./three.hooks";
 import { Matrix4 } from "three";
-import { ca } from "element-plus/es/locale/index.mjs";
 
 const planePosition = ref(new THREE.Vector3(0, 0, 0));
-
-let helix = null;
 
 const position = computed(() => {
   return `x: ${planePosition.value.x.toFixed(
@@ -83,18 +80,47 @@ onMounted(() => {
     0.1,
     1000
   );
-  camera.lookAt(new THREE.Vector3(-100, 50, 20));
+  // 相机位置
+  const pos = {
+    x: -84.95353646633488,
+    y: 53.37053405808688,
+    z: 75.19881951492063,
+  };
 
-  camera.position.set(41, 46, 81);
+  camera.position.set(pos.x, pos.y, pos.z);
+  const lookAtPosition = {
+    x: 830.57824427382,
+    y: -119.87185656664616,
+    z: -287.8282215514283,
+  };
+  const lookAtVector = new THREE.Vector3(
+    lookAtPosition.x,
+    lookAtPosition.y,
+    lookAtPosition.z
+  );
+  camera.lookAt(lookAtPosition.x, lookAtPosition.y, lookAtPosition.z);
+
   // camera.rotation.set(-19, -34, -11);
   // camera.lookAt(new THREE.Vector3(0.958, -0.1539, -0.24065));
   domRef.value?.appendChild(renderer.domElement);
   // 辅助辅助坐标轴
-  const axesHelper = new THREE.AxesHelper(20);
-  scene.add(axesHelper);
+  // const axesHelper = new THREE.AxesHelper(20);
+  // scene.add(axesHelper);
+
+  // 相机的辅助线
+  // const cameraHelper = new THREE.CameraHelper(camera);
+  // scene.add(cameraHelper);
+
   // 创建飞机跑道
+  const runwayTextureLoader = new THREE.TextureLoader();
+  const runwayTexture = runwayTextureLoader.load(
+    "/assets/textures/TwoLaneRoadCracks01_4K_Roughness.png"
+  );
   const runwayGeometry = new THREE.PlaneGeometry(200, 20); // 长方形几何体
-  const runwayMaterial = new THREE.MeshBasicMaterial({ color: 0x333333 }); // 深灰色材质
+  const runwayMaterial = new THREE.MeshBasicMaterial({
+    color: `RGB(220,220,220)`,
+    map: runwayTexture,
+  }); // 深灰色材质
   const runway = new THREE.Mesh(runwayGeometry, runwayMaterial);
 
   // 旋转跑道，使其平放在地面上
@@ -171,11 +197,11 @@ onMounted(() => {
     planeRef.value.position.set(-200, 0, 0);
     scene.add(data.scene);
     data.scene.name = "airplane";
-    data.scene.position.copy(planePosition);
+    data.scene.position.copy(planePosition.value);
     renderer.setAnimationLoop(render);
   });
 
-  scene.add(curveObject);
+  // scene.add(curveObject);
   const textureLoader = new THREE.CubeTextureLoader();
   const texture = textureLoader.load(
     [
@@ -192,24 +218,26 @@ onMounted(() => {
     }
   );
 
-  const controls = new OrbitControls(camera, renderer.domElement);
-  controls.enableZoom = true;
-  controls.enablePan = true;
-  controls.enabled = true;
-  controls.addEventListener("change", () => {
-    const direction = new THREE.Vector3();
-    camera.getWorldDirection(direction);
+  // const controls = new OrbitControls(camera, renderer.domElement);
+  // controls.enableZoom = true;
+  // controls.enablePan = true;
+  // controls.enabled = true;
+  // controls.target = lookAtVector;
+  // controls.update();
+  // controls.addEventListener("change", () => {
+  //   // const direction = new THREE.Vector3();
+  //   // camera.getWorldDirection(direction);
+  //   // const lookAtPosition = new THREE.Vector3().addVectors(
+  //   //   camera.position,
+  //   //   direction.multiplyScalar(1000)
+  //   // );
 
-    console.log(
-      `camera position: `,
-      camera.position,
-      camera.rotation,
-      direction
-    );
-    renderer.render(scene, camera);
-  });
-
-  // render()
+  //   // console.log("Camera Position:", camera.position);
+  //   // console.log("Camera LookAt Position:", lookAtPosition);
+  //   // camera.updateProjectionMatrix();
+  //   // cameraHelper.update();
+  //   renderer.render(scene, camera);
+  // });
 });
 </script>
 <style scoped lang="scss">
