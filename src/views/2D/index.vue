@@ -1,6 +1,6 @@
 <template>
   <div class="graph-layout">
-    <div class="left-panel"></div>
+    <!-- <div class="left-panel"></div> -->
     <div class="x6-ref">
       <div ref="x6Instance" class="x6-graph"></div>
     </div>
@@ -102,6 +102,8 @@ onMounted(() => {
       },
     });
   });
+
+  graph.centerContent();
 });
 </script>
 
@@ -118,8 +120,8 @@ onMounted(() => {
 }
 
 .x6-ref {
-  width: 800px;
-  height: 1000px;
+  height: 100%;
+  width: 100%;
   .x6-graph {
     height: 100%;
     width: 100%;
