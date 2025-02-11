@@ -1,15 +1,12 @@
 <template>
   <div class="graph-layout">
-    <div class="left-panel"></div>
-    <div class="x6-ref">
-      <div ref="x6Instance" class="x6-graph"></div>
-    </div>
+    <div ref="x6Instance" class="x6-graph"></div>
   </div>
 </template>
 <script lang="ts" setup>
-import { Graph } from "@antv/x6/es";
+import { EdgeView, Graph, Point } from "@antv/x6/es";
 import { onMounted, ref } from "vue";
-import * as glMatrix from "gl-matrix";
+import {OrthogonalConnector} from  './orth'
 const x6Instance = ref();
 onMounted(() => {
   const graph = new Graph({
@@ -27,87 +24,114 @@ onMounted(() => {
     },
     panning: true,
   });
-  graph.addEdge({
-    source: { x: -100, y: 0 },
-    target: { x: 100, y: 0 },
-  });
 
-  graph.addEdge({
-    source: { x: 0, y: -100 },
-    target: { x: 0, y: 100 },
-  });
-
-  const box = {
-    x: -100,
-    y: -100,
+  const sourceBox = {
+    x: 100,
+    y: 100,
     width: 100,
-    height: 100,
-  };
-  const cx = box.x + box.width / 2;
-  const cy = box.y + box.height / 2;
-  const ltx = x6Instance.value.offsetWidth / 2;
-  const lty = x6Instance.value.offsetHeight / 2;
+    height: 50
+  }
 
-  const xFactor = x6Instance.value.offsetWidth / box.width;
-  const yFactor = x6Instance.value.offsetHeight / box.height;
+  const targetBox = {
+    x: 300,
+    y: 100,
+    width: 100,
+    height: 50
+  }
 
-  const factor = Math.min(xFactor, yFactor);
-  //   graph.scale(factor);
+  const source = graph.addNode({
+    x: sourceBox.x,
+    height: sourceBox.height,
+    width: sourceBox.width,
+    y: sourceBox.y,
+  })
 
-  graph.translate(ltx - cx, lty - cy);
+  const target = graph.addNode(targetBox)
 
-  graph.addNode({
-    id: "box-1",
-    x: box.x,
-    y: box.y,
-    width: box.width,
-    height: box.height,
+// Define shapes
+const shapeA = {left: sourceBox.x,  top: sourceBox.y, width: sourceBox.width, height: sourceBox.height};
+const shapeB = {left: targetBox.x, top: targetBox.y, width: targetBox.width, height: targetBox.height};
+
+// Get the connector path
+const path = OrthogonalConnector.route({
+    pointA: {shape: shapeA, side: 'left', distance: 0.5},
+    pointB: {shape: shapeB, side: 'right',  distance: 0.5},
+    shapeMargin: 10,
+    globalBoundsMargin: 100,
+    globalBounds: {left: 0, top: 0, width: 500, height: 500},
+});
+
+const sourcePort = graph.addNode({
+  x: sourceBox.x - 20,
+  y: sourceBox.y + sourceBox.height * 0.5 - 10,
+  width: 20,
+  height: 20,
+  attrs: {
+    body: {
+      fill: 'red',
+      stroke: 'black',
+      strokeWidth: 1
+    }
+  }
+})
+
+const targetPort = graph.addNode({
+  x: targetBox.x + targetBox.width,
+  y: targetBox.y + targetBox.height * 0.5 - 10,
+  width: 20,
+  height: 20,
+  attrs: {
+    body: {
+      fill: 'red',
+      stroke: 'black',
+      strokeWidth: 1
+    }
+  }
+})
+
+source.addChild(sourcePort)
+target.addChild(targetPort)
+
+const archOrth = ( _vertices: Point.PointLike[],
+  _args: any,
+  view: EdgeView,) => {
+
+  const sourceBox = view.sourceBBox
+  const targetBox = view.targetBBox
+  const shapeA = {left: sourceBox.x,  top: sourceBox.y, width: sourceBox.width, height: sourceBox.height};
+  const shapeB = {left: targetBox.x, top: targetBox.y, width: targetBox.width, height: targetBox.height};
+  const path = OrthogonalConnector.route({
+      pointA: {shape: shapeA, side: 'left', distance: 0.5},
+      pointB: {shape: shapeB, side: 'right',  distance: 0.5},
+      shapeMargin: 10,
+      globalBoundsMargin: 10,
+      globalBounds: {left: 0, top: 0, width: 500, height: 500},
   });
+  return path
+}
 
-  //   graph.addNode({
-  //     x: 100,
-  //     y: 100,
-  //     width: 100,
-  //     height: 100,
-  //     attrs: {},
-  //   });
+Graph.registerRouter('archOrth', archOrth)
 
-  // const matrix = new DOMMatrix()
-  //   const rad = glMatrix.glMatrix.toRadian(45);
 
-  //   const m1 = glMatrix.mat2d.create();
-  //   const m2 = glMatrix.mat2d.create();
-  //   const tm = glMatrix.mat2d.fromValues(1, 0, 0, 1, -50, -50);
-  //   const rM = glMatrix.mat2d.create();
-  //   glMatrix.mat2d.rotate(rM, rM, rad);
-  //   const tm1 = glMatrix.mat2d.fromValues(1, 0, 0, 1, 50, 50);
-  //   const sm = glMatrix.mat2d.fromValues(-1, 0, 0, 1, 0, 0);
+graph.addEdge({
+  source: sourcePort,
+  target: targetPort,
+  vertices: path,
+  router: {
+    name: 'archOrth',
+    args: {
+      // padding: 1
+    }
+  },
+  attrs: {
+    line: {
+      targetMarker: null
+    }
+  }
+})
+console.log(path)
 
-  //   glMatrix.mat2d.multiply(m1, tm, m1);
-  //   glMatrix.mat2d.multiply(m1, rM, m1);
-  //   glMatrix.mat2d.multiply(m1, tm1, m1);
-  //   glMatrix.mat2d.multiply(m1, sm, m1);
-  //   console.log(m1);
-  //   const mt = `matrix(${m1[0]}, ${m1[1]}, ${m1[2]}, ${m1[3]}, ${m1[4]}, ${m1[5]})`;
 
-  //   graph.addNode({
-  //     x: 100,
-  //     y: 100,
-  //     width: 100,
-  //     height: 100,
-  //     attrs: {
-  //       body: {
-  //         fill: "red",
-  //         stroke: "blue",
-  //         strokeWidth: 2,
-  //         rx: 10,
-  //         ry: 10,
-  //         transform: mt,
-  //       },
-  //     },
-  //   });
-
-  //   graph.centerPoint(0, 0);
 });
 </script>
 <style lang="scss" scoped>
@@ -121,13 +145,8 @@ onMounted(() => {
     background: red;
   }
 }
-
-.x6-ref {
-  width: 800px;
-  height: 1000px;
-  .x6-graph {
+.x6-graph {
     height: 100%;
     width: 100%;
   }
-}
 </style>
