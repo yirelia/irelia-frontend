@@ -49,11 +49,11 @@ export const routes = [
     component: () => import("@/views/2D/index.vue"),
   },
   {
-    path: "/2d-tube",
+    path: "/2d-canvas",
     meta: {
-      name: "2维管道",
+      name: "canvas 画布",
     },
-    component: () => import("@/views/2D/tube.vue"),
+    component: () => import("@/views/2D/canvas.vue"),
   },
 ];
 const router = createRouter({

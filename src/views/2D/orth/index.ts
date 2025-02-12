@@ -6,6 +6,8 @@
  * 2020
  */
 
+import { Graph } from "@antv/x6/es";
+
 type BasicCardinalPoint = 'n' | 'e' | 's' | 'w';
 type Direction = 'v' | 'h';
 type Side = 'top' | 'right' | 'bottom' | 'left';
@@ -130,7 +132,7 @@ class Rectangle{
         let rectH = rectangle.height;
         return (rectX < thisX + thisW) && (thisX < (rectX + rectW)) && (rectY < thisY + thisH) && (thisY < rectY + rectH);
     }
-
+    // 
     union(r: Rectangle): Rectangle{
         const x = [this.left, this.right, r.left, r.right];
         const y = [this.top, this.bottom, r.top, r.bottom];
@@ -713,7 +715,7 @@ export class OrthogonalConnector{
         connections: [],
     };
 
-    static route(opts: OrthogonalConnectorOpts): Point[]{
+    static route(opts: OrthogonalConnectorOpts, x6Graph: Graph): Point[]{
 
         const {pointA, pointB, globalBoundsMargin} = opts;
         const spots: Point[] = [];
@@ -730,7 +732,6 @@ export class OrthogonalConnector{
         let inflatedA = shapeA.inflate(shapeMargin, shapeMargin);
         let inflatedB = shapeB.inflate(shapeMargin, shapeMargin);
 
-        // debugger
         // Check bounding boxes collision
         if(inflatedA.intersects(inflatedB)){
             shapeMargin = 0;
@@ -740,6 +741,33 @@ export class OrthogonalConnector{
 
         const inflatedBounds = inflatedA.union(inflatedB).inflate(globalBoundsMargin, globalBoundsMargin);
 
+        // x6Graph.addNode({
+        //     x: inflatedBounds.left,
+        //     y: inflatedBounds.top,
+        //     width: inflatedBounds.width,
+        //     height: inflatedBounds.height, 
+        //     attrs: {
+        //         body: {
+        //             stroke: 'red',
+        //             fill: `rgba(255,255, 255, 0.1)`
+        //         }
+        //     },
+        //     zIndex: 2,
+            
+        // })
+
+        // x6Graph.addNode({
+        //     x: bigBounds.left,
+        //     y: bigBounds.top,
+        //     width: bigBounds.width,
+        //     height: bigBounds.height,
+        //     attrs: {
+        //         body: {
+        //             stroke: 'blue',
+        //             fill: `rgba(255,255, 255, 0.1)`
+        //         }
+        //     },
+        // })
         // Curated bounds to stick to
         const bounds = Rectangle.fromLTRB(
             Math.max(inflatedBounds.left, bigBounds.left),
@@ -747,6 +775,20 @@ export class OrthogonalConnector{
             Math.min(inflatedBounds.right, bigBounds.right),
             Math.min(inflatedBounds.bottom, bigBounds.bottom)
         );
+        // x6Graph.addNode({
+        //     x: bounds.left,
+        //     y: bounds.top,
+        //     width: bounds.width,
+        //     height: bounds.height,
+        //     attrs: {
+        //         body: {
+        //             fill: `rgba(255,255, 255, 0.1)`
+        //         }
+        //     },
+        //     zIndex: 1,
+            
+        
+        // })
 
         // Add edges to rulers
         for(const b of [inflatedA, inflatedB]){
