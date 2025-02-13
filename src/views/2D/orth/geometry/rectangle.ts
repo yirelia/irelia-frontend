@@ -4,6 +4,7 @@ interface Size {
     height: number
 }
 
+type Side = 'top' | 'right' | 'bottom' | 'left';
 interface RectangleLike {
     x: number
     y: number
@@ -21,6 +22,12 @@ export class Rectangle{
     static get empty(): Rectangle{
         return new Rectangle(0, 0, 0, 0);
     }
+
+    getSidePoint(side: Side) {
+        switch(side) {
+            case 'top': return new Point(this.x + this.width)
+        }
+    } 
 
     static fromRect(r: RectangleLike): Rectangle{
         return new Rectangle(r.x, r.y, r.width, r.height);
@@ -119,5 +126,5 @@ export class Rectangle{
 
     get size(): Size{
         return {width: this.width, height: this.height};
-    }
+    } 
 }

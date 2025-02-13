@@ -741,33 +741,6 @@ export class OrthogonalConnector{
 
         const inflatedBounds = inflatedA.union(inflatedB).inflate(globalBoundsMargin, globalBoundsMargin);
 
-        // x6Graph.addNode({
-        //     x: inflatedBounds.left,
-        //     y: inflatedBounds.top,
-        //     width: inflatedBounds.width,
-        //     height: inflatedBounds.height, 
-        //     attrs: {
-        //         body: {
-        //             stroke: 'red',
-        //             fill: `rgba(255,255, 255, 0.1)`
-        //         }
-        //     },
-        //     zIndex: 2,
-            
-        // })
-
-        // x6Graph.addNode({
-        //     x: bigBounds.left,
-        //     y: bigBounds.top,
-        //     width: bigBounds.width,
-        //     height: bigBounds.height,
-        //     attrs: {
-        //         body: {
-        //             stroke: 'blue',
-        //             fill: `rgba(255,255, 255, 0.1)`
-        //         }
-        //     },
-        // })
         // Curated bounds to stick to
         const bounds = Rectangle.fromLTRB(
             Math.max(inflatedBounds.left, bigBounds.left),
@@ -822,6 +795,7 @@ export class OrthogonalConnector{
         // Create grid
         const grid = rulersToGrid(verticals, horizontals, bounds);
         const gridPoints = gridToSpots(grid, [inflatedA, inflatedB]);
+
 
         // Add to spots
         spots.push(...gridPoints);
