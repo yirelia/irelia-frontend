@@ -1,0 +1,498 @@
+{
+    "meta_information": {
+        "schema_version": "0.0.20",
+        "creator": "OCT library indexer",
+        "created": "2025-02-18T15:12:44.217002800",
+        "content_type": "ModelAST-JSON"
+    },
+    "elements": {
+        "PID_Controller": {
+            "annotation": {
+                "Diagram": {
+                    "class_modification": {
+                        "coordinateSystem": {
+                            "class_modification": {
+                                "preserveAspectRatio": {
+                                    "binding": "true"
+                                },
+                                "extent": {
+                                    "binding": "{{-100,-100},{100,100}}"
+                                }
+                            }
+                        },
+                        "graphics": {
+                            "binding": "{Rectangle(extent={{-99,48},{-32,8}},lineColor={255,0,0}),Text(extent={{-98,59},{-31,51}},textColor={255,0,0},textString=\"reference speed generation\"),Text(extent={{-98,-46},{-60,-52}},textColor={255,0,0},textString=\"PI controller\"),Line(points={{-76,-44},{-57,-23}},color={255,0,0},arrow={Arrow.None,Arrow.Filled}),Rectangle(extent={{-25,6},{99,-50}},lineColor={255,0,0}),Text(extent={{4,14},{71,7}},textColor={255,0,0},textString=\"plant (simple drive train)\")}"
+                        }
+                    }
+                },
+                "experiment": {
+                    "class_modification": {
+                        "StopTime": {
+                            "binding": "4"
+                        }
+                    }
+                },
+                "Documentation": {
+                    "class_modification": {
+                        "info": {
+                            "binding": "\"<html>\n\n<p>\nThis is a simple drive train controlled by a PID controller:\n</p>\n\n<ul>\n<li> The two blocks \\\"kinematic_PTP\\\" and \\\"integrator\\\" are used to generate\n     the reference speed (= constant acceleration phase, constant speed phase,\n     constant deceleration phase until inertia is at rest). To check\n     whether the system starts in steady state, the reference speed is\n     zero until time = 0.5 s and then follows the sketched trajectory.</li>\n\n<li> The block \\\"PI\\\" is an instance of \\\"Blocks.Continuous.LimPID\\\" which is\n     a PID controller where several practical important aspects, such as\n     anti-windup-compensation has been added. In this case, the control block\n     is used as PI controller.</li>\n\n<li> The output of the controller is a torque that drives a motor inertia\n     \\\"inertia1\\\". Via a compliant spring/damper component, the load\n     inertia \\\"inertia2\\\" is attached. A constant external torque of 10 Nm\n     is acting on the load inertia.</li>\n</ul>\n\n<p>\nThe PI controller is initialized in steady state (initType=SteadyState)\nand the drive shall also be initialized in steady state.\nHowever, it is not possible to initialize \\\"inertia1\\\" in SteadyState, because\n\\\"der(inertia1.phi)=inertia1.w=0\\\" is an input to the PI controller that\ndefines that the derivative of the integrator state is zero (= the same\ncondition that was already defined by option SteadyState of the PI controller).\nFurthermore, one initial condition is missing, because the absolute position\nof inertia1 or inertia2 is not defined. The solution shown in this examples is\nto initialize the angle and the angular acceleration of \\\"inertia1\\\".\n</p>\n\n<p>\nIn the following figure, results of a typical simulation are shown:\n</p>\n\n<img src=\\\"modelica://Modelica/Resources/Images/Blocks/Examples/PID_controller.png\\\"\n     alt=\\\"PID_controller.png\\\"><br>\n\n<img src=\\\"modelica://Modelica/Resources/Images/Blocks/Examples/PID_controller2.png\\\"\n     alt=\\\"PID_controller2.png\\\">\n\n<p>\nIn the upper figure the reference speed (= integrator.y) and\nthe actual speed (= inertia1.w) are shown. As can be seen,\nthe system initializes in steady state, since no transients\nare present. The inertia follows the reference speed quite good\nuntil the end of the constant speed phase. Then there is a deviation.\nIn the lower figure the reason can be seen: The output of the\ncontroller (PI.y) is in its limits. The anti-windup compensation\nworks reasonably, since the input to the limiter (PI.limiter.u)\nis forced back to its limit after a transient phase.\n</p>\n\n</html>\""
+                        }
+                    }
+                },
+                "uses": {
+                    "class_modification": {
+                        "Modelica": {
+                            "class_modification": {
+                                "version": {
+                                    "binding": "\"4.0.0\""
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "class_prefixes": [
+                "model"
+            ],
+            "copyAllowed": true,
+            "description": "Demonstrates the usage of a Continuous.LimPID controller",
+            "order": 0,
+            "viewSourceAllowed": true,
+            "elements": {
+                "driveAngle": {
+                    "binding": "1.57079632679489",
+                    "description": "Reference distance to move",
+                    "order": 1,
+                    "type_specifier": ".Modelica.Units.SI.Angle",
+                    "type_prefix": [
+                        "parameter"
+                    ]
+                },
+                "PI": {
+                    "annotation": {
+                        "Placement": {
+                            "class_modification": {
+                                "transformation": {
+                                    "class_modification": {
+                                        "extent": {
+                                            "binding": "{{60.0,54.0},{80.0,74.0}}"
+                                        },
+                                        "rotation": {
+                                            "binding": "0.0"
+                                        },
+                                        "origin": {
+                                            "binding": "{0.0,0.0}"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "class_modification": {
+                        "k": {
+                            "binding": "100"
+                        },
+                        "Ti": {
+                            "binding": "0.1"
+                        },
+                        "yMax": {
+                            "binding": "12"
+                        },
+                        "Ni": {
+                            "binding": "0.1"
+                        },
+                        "initType": {
+                            "binding": "Modelica.Blocks.Types.Init.SteadyState"
+                        },
+                        "controllerType": {
+                            "binding": "Modelica.Blocks.Types.SimpleController.PI"
+                        },
+                        "limiter": {
+                            "class_modification": {
+                                "u": {
+                                    "class_modification": {
+                                        "start": {
+                                            "binding": "0"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "Td": {
+                            "binding": "0.1"
+                        }
+                    },
+                    "order": 2,
+                    "type_specifier": "Modelica.Blocks.Continuous.LimPID"
+                },
+                "inertia1": {
+                    "annotation": {
+                        "Placement": {
+                            "class_modification": {
+                                "transformation": {
+                                    "class_modification": {
+                                        "extent": {
+                                            "binding": "{{50.0,58.0},{70.0,78.0}}"
+                                        },
+                                        "rotation": {
+                                            "binding": "0.0"
+                                        },
+                                        "origin": {
+                                            "binding": "{0.0,0.0}"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "class_modification": {
+                        "phi": {
+                            "class_modification": {
+                                "fixed": {
+                                    "binding": "true"
+                                },
+                                "start": {
+                                    "binding": "0"
+                                }
+                            }
+                        },
+                        "J": {
+                            "binding": "1"
+                        },
+                        "a": {
+                            "class_modification": {
+                                "fixed": {
+                                    "binding": "true"
+                                },
+                                "start": {
+                                    "binding": "0"
+                                }
+                            }
+                        }
+                    },
+                    "order": 3,
+                    "type_specifier": "Modelica.Mechanics.Rotational.Components.Inertia"
+                },
+                "torque": {
+                    "annotation": {
+                        "Placement": {
+                            "class_modification": {
+                                "transformation": {
+                                    "class_modification": {
+                                        "extent": {
+                                            "binding": "{{99.5,106.0},{119.5,126.0}}"
+                                        },
+                                        "rotation": {
+                                            "binding": "0.0"
+                                        },
+                                        "origin": {
+                                            "binding": "{0.0,0.0}"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "order": 4,
+                    "type_specifier": "Modelica.Mechanics.Rotational.Sources.Torque"
+                },
+                "spring": {
+                    "annotation": {
+                        "Placement": {
+                            "class_modification": {
+                                "transformation": {
+                                    "class_modification": {
+                                        "extent": {
+                                            "binding": "{{63.5,44.0},{83.5,64.0}}"
+                                        },
+                                        "rotation": {
+                                            "binding": "0.0"
+                                        },
+                                        "origin": {
+                                            "binding": "{0.0,0.0}"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "class_modification": {
+                        "c": {
+                            "binding": "1e4"
+                        },
+                        "d": {
+                            "binding": "100"
+                        },
+                        "stateSelect": {
+                            "binding": "StateSelect.prefer"
+                        },
+                        "w_rel": {
+                            "class_modification": {
+                                "fixed": {
+                                    "binding": "true"
+                                }
+                            }
+                        }
+                    },
+                    "order": 5,
+                    "type_specifier": "Modelica.Mechanics.Rotational.Components.SpringDamper"
+                },
+                "inertia2": {
+                    "annotation": {
+                        "Placement": {
+                            "class_modification": {
+                                "transformation": {
+                                    "class_modification": {
+                                        "extent": {
+                                            "binding": "{{91.5,44.0},{111.5,64.0}}"
+                                        },
+                                        "rotation": {
+                                            "binding": "0.0"
+                                        },
+                                        "origin": {
+                                            "binding": "{0.0,0.0}"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "class_modification": {
+                        "J": {
+                            "binding": "2"
+                        }
+                    },
+                    "order": 6,
+                    "type_specifier": "Modelica.Mechanics.Rotational.Components.Inertia"
+                },
+                "kinematicPTP": {
+                    "annotation": {
+                        "Placement": {
+                            "class_modification": {
+                                "transformation": {
+                                    "class_modification": {
+                                        "extent": {
+                                            "binding": "{{97.5,110.0},{117.5,130.0}}"
+                                        },
+                                        "rotation": {
+                                            "binding": "0.0"
+                                        },
+                                        "origin": {
+                                            "binding": "{0.0,0.0}"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "class_modification": {
+                        "startTime": {
+                            "binding": "0.5"
+                        },
+                        "deltaq": {
+                            "binding": "{driveAngle}"
+                        },
+                        "qd_max": {
+                            "binding": "{1}"
+                        },
+                        "qdd_max": {
+                            "binding": "{1}"
+                        }
+                    },
+                    "order": 7,
+                    "type_specifier": "Modelica.Blocks.Sources.KinematicPTP"
+                },
+                "speedSensor": {
+                    "annotation": {
+                        "Placement": {
+                            "class_modification": {
+                                "transformation": {
+                                    "class_modification": {
+                                        "extent": {
+                                            "binding": "{{112.0,54.0},{92.0,74.0}}"
+                                        },
+                                        "rotation": {
+                                            "binding": "0.0"
+                                        },
+                                        "origin": {
+                                            "binding": "{0.0,0.0}"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "order": 8,
+                    "type_specifier": "Modelica.Mechanics.Rotational.Sensors.SpeedSensor"
+                },
+                "loadTorque": {
+                    "annotation": {
+                        "Placement": {
+                            "class_modification": {
+                                "transformation": {
+                                    "class_modification": {
+                                        "extent": {
+                                            "binding": "{{119.0,37.0},{109.0,47.0}}"
+                                        },
+                                        "rotation": {
+                                            "binding": "0.0"
+                                        },
+                                        "origin": {
+                                            "binding": "{0.0,0.0}"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "class_modification": {
+                        "tau_constant": {
+                            "binding": "10"
+                        },
+                        "useSupport": {
+                            "binding": "false"
+                        }
+                    },
+                    "order": 9,
+                    "type_specifier": "Modelica.Mechanics.Rotational.Sources.ConstantTorque"
+                },
+                "integrator": {
+                    "annotation": {
+                        "Placement": {
+                            "class_modification": {
+                                "transformation": {
+                                    "class_modification": {
+                                        "extent": {
+                                            "binding": "{{86.0,40.0},{106.0,60.0}}"
+                                        },
+                                        "origin": {
+                                            "binding": "{0.0,0.0}"
+                                        },
+                                        "rotation": {
+                                            "binding": "0.0"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "order": 10,
+                    "type_specifier": ".Modelica.Blocks.Continuous.Integrator"
+                }
+            },
+            "equations": [
+                {
+                    "equation": "connect(spring.flange_b, inertia2.flange_a)",
+                    "annotation": {
+                        "Line": {
+                            "class_modification": {
+                                "points": {
+                                    "binding": "{{83.5,54},{91.5,54}}"
+                                }
+                            }
+                        }
+                    },
+                    "left": "spring.flange_b",
+                    "right": "inertia2.flange_a"
+                },
+                {
+                    "equation": "connect(inertia1.flange_b, spring.flange_a)",
+                    "annotation": {
+                        "Line": {
+                            "class_modification": {
+                                "points": {
+                                    "binding": "{{70,68},{70,54},{63.5,54}}"
+                                }
+                            }
+                        }
+                    },
+                    "left": "inertia1.flange_b",
+                    "right": "spring.flange_a"
+                },
+                {
+                    "equation": "connect(torque.flange, inertia1.flange_a)",
+                    "annotation": {
+                        "Line": {
+                            "class_modification": {
+                                "points": {
+                                    "binding": "{{119.5,116},{50,116},{50,68}}"
+                                }
+                            }
+                        }
+                    },
+                    "left": "torque.flange",
+                    "right": "inertia1.flange_a"
+                },
+                {
+                    "equation": "connect(speedSensor.flange, inertia1.flange_b)",
+                    "annotation": {
+                        "Line": {
+                            "class_modification": {
+                                "points": {
+                                    "binding": "{{112,64},{112,68},{70,68}}"
+                                }
+                            }
+                        }
+                    },
+                    "left": "speedSensor.flange",
+                    "right": "inertia1.flange_b"
+                },
+                {
+                    "equation": "connect(loadTorque.flange, inertia2.flange_b)",
+                    "annotation": {
+                        "Line": {
+                            "class_modification": {
+                                "points": {
+                                    "binding": "{{109,42},{111.5,42},{111.5,54}}"
+                                }
+                            }
+                        }
+                    },
+                    "left": "loadTorque.flange",
+                    "right": "inertia2.flange_b"
+                },
+                {
+                    "equation": "connect(PI.y, torque.tau)",
+                    "annotation": {
+                        "Line": {
+                            "class_modification": {
+                                "points": {
+                                    "binding": "{{81,64},{81,116},{97.5,116}}"
+                                },
+                                "color": {
+                                    "binding": "{0,0,127}"
+                                }
+                            }
+                        }
+                    },
+                    "left": "PI.y",
+                    "right": "torque.tau"
+                },
+                {
+                    "equation": "connect(speedSensor.w, PI.u_m)",
+                    "annotation": {
+                        "Line": {
+                            "class_modification": {
+                                "points": {
+                                    "binding": "{{91,64},{70,64},{70,52}}"
+                                },
+                                "color": {
+                                    "binding": "{0,0,127}"
+                                }
+                            }
+                        }
+                    },
+                    "left": "speedSensor.w",
+                    "right": "PI.u_m"
+                }
+            ],
+            "extends": [
+                {
+                    "type_specifier": "Modelica.Icons.Example",
+                    "order": 0
+                }
+            ],
+            "isReadOnly": false
+        }
+    }
+}
