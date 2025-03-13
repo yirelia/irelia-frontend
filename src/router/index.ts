@@ -8,54 +8,7 @@
  */
 import { createRouter, createWebHistory } from "vue-router";
 
-export const routes = [
-  {
-    path: "/",
-    redirect: "/2d",
-  },
-  {
-    path: "/3d",
-    meta: {
-      name: "3D动画",
-    },
-    component: () => import("@/views/3D/index.vue"),
-  },
-  {
-    path: "/plane",
-    meta: {
-      name: "飞机动画",
-    },
-    component: () => import("@/views/3D/plane.vue"),
-  },
-  {
-    path: "/dump",
-    meta: {
-      name: "catia导出glb测试",
-    },
-    component: () => import("@/views/3D/dump.vue"),
-  },
-  {
-    path: "/grain",
-    meta: {
-      name: "粒子系统测试",
-    },
-    component: () => import("@/views/3D/grain.vue"),
-  },
-  {
-    path: "/2d",
-    meta: {
-      name: "2维测试",
-    },
-    component: () => import("@/views/2D/index.vue"),
-  },
-  {
-    path: "/2d-canvas",
-    meta: {
-      name: "canvas 画布",
-    },
-    component: () => import("@/views/2D/canvas.vue"),
-  },
-];
+export const routes = [];
 const router = createRouter({
   history: createWebHistory(),
   routes,

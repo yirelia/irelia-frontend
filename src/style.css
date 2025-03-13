@@ -3,6 +3,8 @@ html, body, #app {
 }
 * {
   box-sizing: border-box;
+  margin: 0;
+  padding: );
 }
 
 *::before,*::after {
