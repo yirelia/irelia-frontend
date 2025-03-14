@@ -1,24 +1,42 @@
 <script setup lang="ts">
 import { Graph } from '@antv/x6/es';
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { ElMessage } from 'element-plus';
 
 const grapRef = ref<HTMLElement | null>(null);
 
-
-const state = ref({
+interface Store {
   hasCommond: false,
   hasRedo: false
-})
-const data = ref<{ name: string, id: string, age: string }>({
+}
+
+interface Data { name: string, id: string, age: string }
+
+
+
+const data = ref<Data>({
   name: '',
   id: '',
   age: ''
 })
+const proxyData = computed(() => {
+  return new Proxy(data, {
+    get(target, key) {
+      return Reflect.get(target.value, key)
+    },
+    set(target, key: string, value) {
+      const oldValue = Reflect.get(target.value, key)
+      const updateDataCommand = new UpdateDataCommand(data, { key, value, oldValue })
+      history.execute(updateDataCommand)
+      return true
+    }
+  })
+})
+
 
 abstract class Command {
   abstract execute(): any;
-  abstract redo(): any;
+  abstract unexecute(): any;
 }
 
 class AddNodeCommand extends Command {
@@ -30,25 +48,26 @@ class AddNodeCommand extends Command {
     this.graph.addNode(this.node);
   }
 
-  redo() {
-    this.graph.removeCell(this.node)
+  unexecute() {
+    this.graph.removeCell(this.node);
   }
 }
 
 class UpdateDataCommand extends Command {
-  constructor(private node: any, private oldData: any, private newData: any) {
+  constructor(private node: any, private data: { key: string, value: any, oldValue: any }) {
     super();
   }
 
   execute() {
-    this.node.setData(this.newData);
+    this.node.value[this.data.key] = this.data.value
   }
 
-  redo() {
-    this.node.setData(this.oldData);
+  unexecute() {
+    this.node.value[this.data.key] = this.data.oldValue
   }
 }
 
+// 命令invoker
 class History {
   private history: Command[] = [];
   private redoStack: Command[] = [];
@@ -69,7 +88,7 @@ class History {
   undo() {
     const command = this.history.pop();
     if (command) {
-      command.execute();
+      command.unexecute();
       this.redoStack.push(command);
     }
   }
@@ -77,7 +96,7 @@ class History {
   redo() {
     const command = this.redoStack.pop();
     if (command) {
-      command.redo();
+      command.execute();
       this.history.push(command);
     }
   }
@@ -132,18 +151,21 @@ onMounted(() => {
   });
 
   graph.on('node:click', ({ node }) => {
-    console.log(node.getData());
     data.value = node.getData();
   });
 });
 
 let val = 3
+let pos = {
+  x: 300,
+  y: 300
+}
 const addNode = () => {
   ++val;
   const addNodeCommand = new AddNodeCommand(graph, {
     id: val.toString(),
-    x: 300,
-    y: 300,
+    x: pos.x,
+    y: pos.y,
     width: 100,
     height: 40,
     label: val.toString(),
@@ -153,6 +175,9 @@ const addNode = () => {
       age: val.toString()
     }
   });
+
+  pos.x += 50
+  pos.y += 50
 
   history.execute(addNodeCommand);
 }
@@ -164,6 +189,18 @@ const removeNode = () => {
   });
   // graph.removeNode(val.toString());
 }
+
+const undo = () => {
+  history.undo()
+}
+
+const redo = () => {
+  history.redo()
+}
+
+const handleNameChange = (val) => {
+  proxyData.name = val
+}
 </script>
 
 <template>
@@ -171,15 +208,15 @@ const removeNode = () => {
     <div class="left-panel" ref="grapRef"></div>
     <div class="right-panel">
       <div>
-        <el-button>撤销</el-button>
-        <el-button>重做</el-button>
+        <el-button @click="undo">撤销</el-button>
+        <el-button @click="redo">重做</el-button>
       </div>
       <el-button @click="addNode">新增节点</el-button>
       <el-button @click="removeNode">删除节点</el-button>
 
-      <el-input v-model="data.id"></el-input>
-      <el-input v-model="data.name"></el-input>
-      <el-input v-model="data.age"></el-input>
+      <el-input v-model="proxyData.id"></el-input>
+      <el-input v-model="proxyData.name"></el-input>
+      <el-input v-model="proxyData.age"></el-input>
     </div>
   </div>
 </template>
