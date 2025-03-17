@@ -1,0 +1,295 @@
+{
+  "class_definition": [
+    {
+      "class_prefixes": "block",
+      "class_specifier": {
+        "long_class_specifier": {
+          "identifier": "Gain",
+          "description_string": "Output the product of a gain value with the input signal",
+          "composition": {
+            "element_list": [
+              {
+                "component_clause": {
+                  "type_prefix": "parameter",
+                  "type_specifier": "Real",
+                  "component_list": [
+                    {
+                      "declaration": {
+                        "identifier": "k",
+                        "modification": {
+                          "class_modification": [
+                            {
+                              "element_modification_or_replaceable": {
+                                "element_modification": {
+                                  "name": "start",
+                                  "modification": {
+                                    "equal": true,
+                                    "expression": {
+                                      "simple_expression": "1"
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            {
+                              "element_modification_or_replaceable": {
+                                "element_modification": {
+                                  "name": "unit",
+                                  "modification": {
+                                    "equal": true,
+                                    "expression": {
+                                      "simple_expression": "\"1\""
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      "description": {
+                        "description_string": "Gain value multiplied with input signal"
+                      }
+                    }
+                  ]
+                }
+              }
+            ],
+            "element_sections": [
+              {
+                "public_element_list": [
+                  {
+                    "component_clause": {
+                      "type_specifier": "Interfaces.RealInput",
+                      "component_list": [
+                        {
+                          "declaration": {
+                            "identifier": "u"
+                          },
+                          "description": {
+                            "description_string": "Input signal connector",
+                            "annotation": [
+                              {
+                                "element_modification_or_replaceable": {
+                                  "element_modification": {
+                                    "Placement": {
+                                      "transformation": {
+                                        "extent": [
+                                          {
+                                            "x": -140,
+                                            "y": -20
+                                          },
+                                          {
+                                            "x": -100,
+                                            "y": 20
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "component_clause": {
+                      "type_specifier": "Interfaces.RealOutput",
+                      "component_list": [
+                        {
+                          "declaration": {
+                            "identifier": "y"
+                          },
+                          "description": {
+                            "description_string": "Output signal connector",
+                            "annotation": [
+                              {
+                                "element_modification_or_replaceable": {
+                                  "element_modification": {
+                                    "Placement": {
+                                      "transformation": {
+                                        "extent": [
+                                          {
+                                            "x": 100,
+                                            "y": -10
+                                          },
+                                          {
+                                            "x": 120,
+                                            "y": 10
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "equation_section": {
+                  "equation": [
+                    {
+                      "assignment_equation": {
+                        "lhs": "y",
+                        "rhs": {
+                          "simple_expression": "k*u"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            ],
+            "annotation": [
+              {
+                "element_modification_or_replaceable": {
+                  "element_modification": {
+                    "name": "Documentation",
+                    "modification": {
+                      "class_modification": [
+                        {
+                          "element_modification_or_replaceable": {
+                            "element_modification": {
+                              "name": "info",
+                              "modification": {
+                                "equal": true,
+                                "expression": {
+                                  "simple_expression": "\"<html>\n<p>\nThis block computes output <em>y</em> as\n<em>product</em> of gain <em>k</em> with the\ninput <em>u</em>:\n</p>\n<blockquote><pre>\ny = k * u;\n</pre></blockquote>\n\n</html>\""
+                                }
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              },
+              {
+                "element_modification_or_replaceable": {
+                  "element_modification": {
+                    "name": "Icon",
+                    "modification": {
+                      "class_modification": [
+                        {
+                          "element_modification_or_replaceable": {
+                            "element_modification": {
+                              "coordinateSystem": {
+                                "extent": [
+                                  {
+                                    "x": -100,
+                                    "y": -100
+                                  },
+                                  {
+                                    "x": 100,
+                                    "y": 100
+                                  }
+                                ],
+                                "preserveAspectRatio": "true"
+                              }
+                            }
+                          }
+                        },
+                        {
+                          "element_modification_or_replaceable": {
+                            "element_modification": {
+                              "graphics": [
+                                {
+                                  "name": "Polygon",
+                                  "attribute": {
+                                    "points": [
+                                      {
+                                        "x": -100,
+                                        "y": -100
+                                      },
+                                      {
+                                        "x": -100,
+                                        "y": 100
+                                      },
+                                      {
+                                        "x": 100,
+                                        "y": 0
+                                      },
+                                      {
+                                        "x": -100,
+                                        "y": -100
+                                      }
+                                    ],
+                                    "lineColor": {
+                                      "r": 0,
+                                      "g": 0,
+                                      "b": 127
+                                    },
+                                    "fillColor": {
+                                      "r": 255,
+                                      "g": 255,
+                                      "b": 255
+                                    },
+                                    "fillPattern": "FillPattern.Solid"
+                                  }
+                                },
+                                {
+                                  "name": "Text",
+                                  "attribute": {
+                                    "extent": [
+                                      {
+                                        "x": -150,
+                                        "y": -140
+                                      },
+                                      {
+                                        "x": 150,
+                                        "y": -100
+                                      }
+                                    ],
+                                    "textString": ",textString="
+                                  }
+                                },
+                                {
+                                  "name": "Text",
+                                  "attribute": {
+                                    "extent": [
+                                      {
+                                        "x": -150,
+                                        "y": 140
+                                      },
+                                      {
+                                        "x": 150,
+                                        "y": 100
+                                      }
+                                    ],
+                                    "textString": "\"%name\"",
+                                    "textColor": {
+                                      "r": 0,
+                                      "g": 0,
+                                      "b": 255
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "modelicaFile": "test\\FromModelica\\Gain.mo",
+  "fullMoFilePath": "D:\\modelica\\modelica-json\\test\\FromModelica\\Gain.mo",
+  "checksum": "14291d280c7015fa94a14ad63793e416"
+}
