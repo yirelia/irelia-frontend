@@ -21,7 +21,7 @@ class GenerateAst {
     let text = ``;
     const filepath = path.join(outputDir, `${baseName}.ts`);
     text += `abstract class ${baseName} {\n`
-    
+
     text += `}\n`;
     fs.writeFile(filepath, text, "utf8", (err) => {
       if (err) {
@@ -32,3 +32,6 @@ class GenerateAst {
     });
   }
 }
+
+console.log(process.argv);
+// GenerateAst.main(process.argv.slice(2));
