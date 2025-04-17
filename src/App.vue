@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { AstPrinter } from './lox/ast-printer';
 import { Lox } from './lox/lox';
 
 const souceCode = `
@@ -16,6 +17,8 @@ print("Hello " + name);
 `
 
 Lox.run(souceCode);
+AstPrinter.main()
+
 </script>
 
 <template>
