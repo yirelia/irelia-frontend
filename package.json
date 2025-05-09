@@ -19,6 +19,7 @@
     "dat.gui": "^0.7.9",
     "echarts": "^5.5.1",
     "element-plus": "^2.3.12",
+    "elkjs": "^0.10.0",
     "fast-xml-parser": "^4.3.3",
     "mitt": "^3.0.1",
     "signals": "^1.0.0",

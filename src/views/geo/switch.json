@@ -1,0 +1,441 @@
+{
+  "data": {
+    "encryption": false,
+    "model": {
+      "graphics": {
+        "connections": {
+          "extends": [],
+          "model": []
+        },
+        "diagram": {
+          "extends": [],
+          "model": []
+        },
+        "elements": {
+          "extends": [],
+          "model": [
+            {
+              "classname": "Modelica.Blocks.MathInteger.MultiSwitch",
+              "comment": "Set Integer expression that is associated with the first active input signal",
+              "connectors": [
+                {
+                  "classname": "Modelica.Blocks.Interfaces.BooleanVectorInput",
+                  "comment": "Set y = expr[i], if u[i] = true",
+                  "coordinateSystem": {
+                    "extent": [
+                      [-100, -100],
+                      [100, 100]
+                    ],
+                    "initialScale": 0.2,
+                    "preserveAspectRatio": false
+                  },
+                  "direction": "input",
+                  "extents": [
+                    [-110, 30],
+                    [-90, -30]
+                  ],
+                  "modelName": "Modelica.Blocks.MathInteger.MultiSwitch",
+                  "name": "u",
+                  "origin": null,
+                  "outputType": {
+                    "connectorSizing": true,
+                    "name": "nu",
+                    "num": "0"
+                  },
+                  "parentName": "multiSwitch1",
+                  "restriction": "connector",
+                  "rotation": 0,
+                  "subShapes": [
+                    {
+                      "closure": {
+                        "index": 2,
+                        "kind": "enum",
+                        "name": "EllipseClosure.Chord"
+                      },
+                      "endingAngle": 360,
+                      "extentsPoints": [
+                        [-100, -100],
+                        [100, 100]
+                      ],
+                      "fillColor": [255, 0, 255],
+                      "fillPattern": {
+                        "index": 2,
+                        "kind": "enum",
+                        "name": "FillPattern.Solid"
+                      },
+                      "lineColor": [255, 0, 255],
+                      "linePattern": {
+                        "index": 2,
+                        "kind": "enum",
+                        "name": "LinePattern.Solid"
+                      },
+                      "offset": [0, 0],
+                      "rotation": 0,
+                      "startingAngle": 0,
+                      "thickness": 0.25,
+                      "type": "Ellipse",
+                      "visible": true
+                    }
+                  ],
+                  "type": {
+                    "classname": "Modelica.Blocks.Interfaces.BooleanVectorInput",
+                    "name": "u",
+                    "restriction": "connector",
+                    "direction": "input",
+                    "elements": [],
+                    "extends": [],
+                    "type": "Boolean"
+                  }
+                },
+                {
+                  "classname": "Modelica.Blocks.Interfaces.IntegerOutput",
+                  "comment": "Output depending on expression",
+                  "coordinateSystem": {
+                    "extent": [
+                      [-100, -100],
+                      [100, 100]
+                    ],
+                    "initialScale": 0.1,
+                    "preserveAspectRatio": true
+                  },
+                  "direction": "output",
+                  "extents": [
+                    [300, -10],
+                    [320, 10]
+                  ],
+                  "modelName": "Modelica.Blocks.MathInteger.MultiSwitch",
+                  "name": "y",
+                  "origin": null,
+                  "outputType": {},
+                  "parentName": "multiSwitch1",
+                  "restriction": "connector",
+                  "rotation": 0,
+                  "subShapes": [
+                    {
+                      "extentsPoints": [
+                        [-100, 100],
+                        [100, 0],
+                        [-100, -100],
+                        [-100, 100]
+                      ],
+                      "fillColor": [255, 255, 255],
+                      "fillPattern": {
+                        "index": 2,
+                        "kind": "enum",
+                        "name": "FillPattern.Solid"
+                      },
+                      "lineColor": [255, 127, 0],
+                      "linePattern": {
+                        "index": 2,
+                        "kind": "enum",
+                        "name": "LinePattern.Solid"
+                      },
+                      "offset": [0, 0],
+                      "rotation": 0,
+                      "smooth": {
+                        "index": 1,
+                        "kind": "enum",
+                        "name": "Smooth.None"
+                      },
+                      "thickness": 0.25,
+                      "type": "Polygon",
+                      "visible": true
+                    }
+                  ],
+                  "type": {
+                    "classname": "Modelica.Blocks.Interfaces.IntegerOutput",
+                    "name": "y",
+                    "restriction": "connector",
+                    "direction": "output",
+                    "elements": [],
+                    "extends": [],
+                    "type": "Integer"
+                  }
+                }
+              ],
+              "coordinateSystem": {
+                "extent": [
+                  [-100, -100],
+                  [300, 100]
+                ],
+                "initialScale": 0.1,
+                "preserveAspectRatio": false
+              },
+              "direction": "",
+              "extents": [
+                [-20, -10],
+                [20, 10]
+              ],
+              "modelName": "switch",
+              "name": "multiSwitch1",
+              "origin": [0, 0],
+              "outputType": {},
+              "parentName": "",
+              "restriction": "block",
+              "rotation": 0,
+              "subShapes": [
+                {
+                  "extentsPoints": [
+                    [310, -25],
+                    [410, -45]
+                  ],
+                  "fillColor": [0, 0, 0],
+                  "fillPattern": {
+                    "index": 1,
+                    "kind": "enum",
+                    "name": "FillPattern.None"
+                  },
+                  "fontName": "",
+                  "fontSize": 0,
+                  "glyph": [],
+                  "horizontalAlignment": "TextAlignment.Center",
+                  "lineColor": [0, 0, 0],
+                  "linePattern": {
+                    "index": 2,
+                    "kind": "enum",
+                    "name": "LinePattern.Solid"
+                  },
+                  "offset": [0, 0],
+                  "rotation": 0,
+                  "textColor": [-1, -1, -1],
+                  "textString": "",
+                  "thickness": 0.25,
+                  "type": "Text",
+                  "varName": "",
+                  "visible": true
+                },
+                {
+                  "extentsPoints": [
+                    [-100, -60],
+                    [300, -90]
+                  ],
+                  "fillColor": [0, 0, 0],
+                  "fillPattern": {
+                    "index": 1,
+                    "kind": "enum",
+                    "name": "FillPattern.None"
+                  },
+                  "fontName": "",
+                  "fontSize": 0,
+                  "glyph": [],
+                  "horizontalAlignment": "TextAlignment.Center",
+                  "lineColor": [0, 0, 0],
+                  "linePattern": {
+                    "index": 2,
+                    "kind": "enum",
+                    "name": "LinePattern.Solid"
+                  },
+                  "offset": [0, 0],
+                  "rotation": 0,
+                  "textColor": [-1, -1, -1],
+                  "textString": "else: 0",
+                  "thickness": 0.25,
+                  "type": "Text",
+                  "varName": "y_default",
+                  "visible": {
+                    "exp": {
+                      "kind": "cref",
+                      "parts": [
+                        {
+                          "name": "multiSwitch1"
+                        },
+                        {
+                          "name": "use_pre_as_default"
+                        }
+                      ]
+                    },
+                    "kind": "unary_op",
+                    "op": "not"
+                  }
+                },
+                {
+                  "extentsPoints": [
+                    [-100, -50],
+                    [300, -80]
+                  ],
+                  "fillColor": [0, 0, 0],
+                  "fillPattern": {
+                    "index": 1,
+                    "kind": "enum",
+                    "name": "FillPattern.None"
+                  },
+                  "fontName": "",
+                  "fontSize": 0,
+                  "glyph": [],
+                  "horizontalAlignment": "TextAlignment.Center",
+                  "lineColor": [0, 0, 0],
+                  "linePattern": {
+                    "index": 2,
+                    "kind": "enum",
+                    "name": "LinePattern.Solid"
+                  },
+                  "offset": [0, 0],
+                  "rotation": 0,
+                  "textColor": [-1, -1, -1],
+                  "textString": "else: pre(y)",
+                  "thickness": 0.25,
+                  "type": "Text",
+                  "varName": "",
+                  "visible": {
+                    "kind": "cref",
+                    "parts": [
+                      {
+                        "name": "multiSwitch1"
+                      },
+                      {
+                        "name": "use_pre_as_default"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "borderPattern": {
+                    "index": 2,
+                    "kind": "enum",
+                    "name": "BorderPattern.Raised"
+                  },
+                  "borderRadius": 0,
+                  "extentsPoints": [
+                    [-100, -40],
+                    [300, 40]
+                  ],
+                  "fillColor": [255, 213, 170],
+                  "fillPattern": {
+                    "index": 2,
+                    "kind": "enum",
+                    "name": "FillPattern.Solid"
+                  },
+                  "lineColor": [0, 0, 0],
+                  "linePattern": {
+                    "index": 2,
+                    "kind": "enum",
+                    "name": "LinePattern.Solid"
+                  },
+                  "offset": [0, 0],
+                  "rotation": 0,
+                  "thickness": 0.25,
+                  "type": "Rectangle",
+                  "visible": true
+                },
+                {
+                  "extentsPoints": [
+                    [-100, 90],
+                    [300, 50]
+                  ],
+                  "fillColor": [0, 0, 0],
+                  "fillPattern": {
+                    "index": 1,
+                    "kind": "enum",
+                    "name": "FillPattern.None"
+                  },
+                  "fontName": "",
+                  "fontSize": 0,
+                  "glyph": [],
+                  "horizontalAlignment": "TextAlignment.Center",
+                  "lineColor": [0, 0, 0],
+                  "linePattern": {
+                    "index": 2,
+                    "kind": "enum",
+                    "name": "LinePattern.Solid"
+                  },
+                  "offset": [0, 0],
+                  "rotation": 0,
+                  "textColor": [0, 0, 255],
+                  "textString": "%name",
+                  "thickness": 0.25,
+                  "type": "Text",
+                  "varName": "",
+                  "visible": true
+                },
+                {
+                  "extentsPoints": [
+                    [-80, 15],
+                    [290, -15]
+                  ],
+                  "fillColor": [0, 0, 0],
+                  "fillPattern": {
+                    "index": 1,
+                    "kind": "enum",
+                    "name": "FillPattern.None"
+                  },
+                  "fontName": "",
+                  "fontSize": 0,
+                  "glyph": [],
+                  "horizontalAlignment": "TextAlignment.Center",
+                  "lineColor": [0, 0, 0],
+                  "linePattern": {
+                    "index": 2,
+                    "kind": "enum",
+                    "name": "LinePattern.Solid"
+                  },
+                  "offset": [0, 0],
+                  "rotation": 0,
+                  "textColor": [-1, -1, -1],
+                  "textString": "expr",
+                  "thickness": 0.25,
+                  "type": "Text",
+                  "varName": "expr",
+                  "visible": true
+                }
+              ],
+              "type": "",
+              "visibleList": null
+            }
+          ]
+        }
+      },
+      "parameters": [
+        {
+          "name": "multiSwitch1",
+          "parameter": [
+            {
+              "comment": "Default value of output y if use_pre_as_default=false, as well as pre(y) at initial time",
+              "defaultValue": "0",
+              "value": null,
+              "extendName": "Modelica.Blocks.MathInteger.MultiSwitch",
+              "group": "Parameters",
+              "name": "y_default",
+              "tab": "General",
+              "type": "Normal",
+              "attributes": {
+                "value": "0"
+              },
+              "parameterUnit": null,
+              "isExtend": false,
+              "visible": true
+            },
+            {
+              "comment": "= true, y holds its last value if all u[i]=false, otherwise y=y_default",
+              "defaultValue": "true",
+              "value": null,
+              "extendName": "Modelica.Blocks.MathInteger.MultiSwitch",
+              "group": "Parameters",
+              "name": "use_pre_as_default",
+              "tab": "General",
+              "type": "CheckBox",
+              "attributes": {
+                "value": "true"
+              },
+              "parameterUnit": null,
+              "isExtend": false,
+              "visible": true
+            }
+          ],
+          "properties": {
+            "causality": "unspecified",
+            "comment": "",
+            "dimension": null,
+            "inner/outer": "none",
+            "path": "Modelica.Blocks.MathInteger.MultiSwitch",
+            "properties": [false, "public", false],
+            "variability": "unspecified"
+          },
+          "type": "component"
+        }
+      ]
+    }
+  },
+  "msg": "",
+  "status": 0,
+  "err": ""
+}

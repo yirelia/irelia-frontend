@@ -1,20 +1,20 @@
-import type { Graph, Markup } from "@antv/x6";
-import type { DiagramShape } from "../model";
+import type { Graph, Markup } from '@antv/x6';
+import type { DiagramCell } from '@/views/simulation/model/components/graphics/type';
 import {
   BitmapAnnotation,
   EllipseAnnotation,
   LineAnnotation,
   PolygonAnnotation,
   RectangleAnnotation,
-  TextAnnotation,
-} from "../annotations";
-import { ShapeLayer } from "../enums";
+  TextAnnotation
+} from '../annotations';
+import { GraphDataTagEnum, ShapeLayer } from '../enums';
 
 export class Diagram {
   public graph: Graph;
-  public rawShape: DiagramShape;
+  public rawShape: DiagramCell;
   public zIndex = ShapeLayer.AnnotationZIndex;
-  constructor(graph: Graph, shape: DiagramShape) {
+  constructor(graph: Graph, shape: DiagramCell) {
     this.graph = graph;
     this.rawShape = shape;
   }
@@ -26,32 +26,32 @@ export class Diagram {
   public getMarkUp(): Markup {
     const shapeType = this.rawShape.type;
     switch (shapeType) {
-      case "Rectangle":
+      case 'Rectangle':
         return new RectangleAnnotation(
           this.graph,
           this.rawShape
         ).markup() as unknown as Markup;
-      case "Line":
+      case 'Line':
         return new LineAnnotation(
           this.graph,
           this.rawShape
         ).markup() as unknown as Markup;
-      case "Polygon":
+      case 'Polygon':
         return new PolygonAnnotation(
           this.graph,
           this.rawShape
         ).markup() as unknown as Markup;
-      case "Ellipse":
+      case 'Ellipse':
         return new EllipseAnnotation(
           this.graph,
           this.rawShape
         ).markup() as unknown as Markup;
-      case "Text":
+      case 'Text':
         return new TextAnnotation(
           this.graph,
           this.rawShape
         ).markup() as unknown as Markup;
-      case "Bitmap":
+      case 'Bitmap':
         return new BitmapAnnotation(
           this.graph,
           this.rawShape
@@ -68,15 +68,28 @@ export class Diagram {
   public createNode() {
     const markup = this.getMarkUp();
     const { zIndex } = this;
-    if (this.rawShape.star) {
-    }
-    if (this.rawShape.type === "Line") {
-      // return this.graph.createEdge();
-    }
+    // 此处坐标系就是原点，不需要移动
+    return this.graph.addNode({
+      data: {
+        tag: GraphDataTagEnum.Diagram,
+        data: this.rawShape
+      },
+      zIndex,
+      markup
+    });
+  }
+  // 只返回节点数据，批量添加
+  public getNode() {
+    const markup = this.getMarkUp();
+    const { zIndex } = this;
     // 此处坐标系就是原点，不需要移动
     return {
-      zIndex: zIndex,
-      markup: [markup],
+      data: {
+        tag: GraphDataTagEnum.Diagram,
+        data: this.rawShape
+      },
+      zIndex,
+      markup
     };
   }
 }

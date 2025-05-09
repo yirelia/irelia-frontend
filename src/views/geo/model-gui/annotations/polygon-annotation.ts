@@ -1,27 +1,24 @@
 import type { Graph } from '@antv/x6';
-import { Transformation } from '../component/transformation';
 import { ShapeType } from '../enums';
-import type { DiagramShape, PointArray } from '../model';
+import type { PointArray } from '../model';
 import ShapeAnnotation from './shape-annotation';
-import type { Component } from '../component/component';
+import type { Component } from '../components/component';
+import type { DiagramCell } from '@/views/simulation/model/components/graphics/type';
 export default class PolygonAnnotation extends ShapeAnnotation {
   tag = ShapeType.Polygon;
-
-  constructor(graph: Graph, shape: DiagramShape, parent: Component) {
+  private isBezier = false;
+  constructor(graph: Graph, shape: DiagramCell, parent?: Component) {
     super(graph, shape, parent);
-    this.transformation = new Transformation(this, parent);
+    this.isBezier = this.rawShape.smooth?.name === 'Smooth.Bezier';
   }
 
   public markup() {
-    const { smooth } = this.shape;
+    const { stroke, strokeWidth } = this;
     const linePoints = this.getPathPoint();
-    const strokeWidth = this.lineThickness;
-    const stroke = this.lineColor;
     const fill = this.fill;
-    const isBezier = smooth === 'Smooth.Bezier';
     const transform = this.transformation.getTransformationMatrix();
-    const path = this.getLine(linePoints, isBezier);
-    if (isBezier) {
+    const path = this.getLine(linePoints, this.isBezier);
+    if (this.isBezier) {
       return {
         tagName: 'path',
         attrs: {
@@ -52,13 +49,13 @@ export default class PolygonAnnotation extends ShapeAnnotation {
    * @param {boolean} isBezier
    * @return {*}
    */
-  public getLine(linePoints, isBezier: boolean) {
+  public getLine(linePoints: PointArray, isBezier: boolean) {
     return isBezier
       ? this.formatPolylineSmoothPath(linePoints)
       : this.formatPolylineNomalPath(linePoints);
   }
 
-  public formatPolylineSmoothPath(linePoints) {
+  public formatPolylineSmoothPath(linePoints: PointArray) {
     const pointLen = linePoints.length;
     const path = [];
     if (pointLen > 0) {

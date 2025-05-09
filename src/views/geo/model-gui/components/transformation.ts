@@ -1,6 +1,6 @@
-import type ShapeAnnotation from "../annotations/shape-annotation";
-import { ViewType } from "../enums";
-import type { Component } from "./component";
+import type ShapeAnnotation from '../annotations/shape-annotation';
+import { ViewScale, ViewType } from '../enums';
+import type { Component } from './component';
 
 export class Transformation {
   public width = 200;
@@ -8,7 +8,7 @@ export class Transformation {
 
   public originDiagram = {
     x: 0,
-    y: 0,
+    y: 0
   };
   public hasOriginDiagram = false;
   public hasOriginDiagramY = false;
@@ -23,7 +23,7 @@ export class Transformation {
 
   public componentOriginDiagram = {
     x: 0,
-    y: 0,
+    y: 0
   };
 
   public rawShape: ShapeAnnotation;
@@ -65,7 +65,13 @@ export class Transformation {
    * @return {*}
    */
   public getViewDiagramTransformationMatrix(): string {
-    // TODO 添加新的变换信息，暂时没有遇到具体的变换信息
+    if (this.shapeRotation !== 0) {
+      this.transfrom.rotate(
+        this.shapeRotation,
+        this.rawShape.originalPoint.x * ViewScale,
+        this.rawShape.originalPoint.y * ViewScale
+      );
+    }
     return this.transfrom.toString();
   }
 
@@ -153,7 +159,7 @@ export class Transformation {
       return {
         sx: iconScaleX,
         sy: iconScaleY,
-        rotation,
+        rotation
       };
       // root 组件 垂直翻转
     } else if (rootScaleX > 0 && rootScaleY < 0) {
@@ -165,7 +171,7 @@ export class Transformation {
       return {
         sx: iconScaleX,
         sy: iconScaleY,
-        rotation,
+        rotation
       };
       // root 组件 水平翻转
     } else if (rootScaleX < 0 && rootScaleY > 0) {
@@ -177,14 +183,14 @@ export class Transformation {
       return {
         sx: iconScaleX,
         sy: iconScaleY,
-        rotation,
+        rotation
       };
       // root 组件水平垂直翻转
     } else {
       return {
         sx: iconScaleX,
         sy: iconScaleY,
-        rotation,
+        rotation
       };
     }
   }
@@ -201,10 +207,12 @@ export class Transform {
     originX?: number,
     originY?: number
   ): Transform {
-    if (originX != undefined && originY != undefined) {
-      this.transform.push(`translate(${originX},${originY})`);
-      this.transform.push(`scale(${sx},${sy})`);
-      this.transform.push(`translate(${-originX},${-originY})`);
+    if (originX !== undefined && originY !== undefined) {
+      this.transform.push(
+        `translate(${originX},${originY})`,
+        `scale(${sx},${sy})`,
+        `translate(${-originX},${-originY})`
+      );
     } else {
       this.transform.push(`scale(${sx},${sy})`);
     }
@@ -226,6 +234,6 @@ export class Transform {
   }
 
   public toString() {
-    return this.transform.join(" ");
+    return this.transform.join(' ');
   }
 }

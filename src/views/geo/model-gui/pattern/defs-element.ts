@@ -67,3 +67,37 @@ export const parttens = [
   <rect x="0" y="0" width="8" height="8" stroke="none" fill="#a0a0a4" mask="url(#FillPattern.CrossDiag.mask)" />
   </pattern>`
 ];
+
+export const PatterMap = {
+  'FillPattern.Horizontal': (
+    id: string,
+    fill: string
+  ) => `<pattern id="${id}" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse" >
+  <rect x="0" y="0" width="8" height="8" stroke="none" fill="${fill}" mask="url(#FillPattern.Horizontal.mask)" />
+  </pattern>`,
+  'FillPattern.Vertical': (
+    id: string,
+    fill: string
+  ) => `<pattern id="${id}" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse" >
+  <rect x="0" y="0" width="8" height="8" stroke="none" fill="${fill}" mask="url(#FillPattern.Vertical.mask)" />
+  </pattern>`,
+  'FillPattern.Cross': (
+    id: string,
+    fill: string
+  ) => `<pattern id="${id}" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse" ><rect x="0" y="0" width="8" height="8" stroke="none" fill="${fill}" mask="url(#FillPattern.Cross.mask)" />
+  </pattern>`,
+  'FillPattern.Forward': (id: string, fill: string) =>
+    `<pattern id="${id}" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse" ><rect x="0" y="0" width="8" height="8" stroke="none" fill="${fill}" mask="url(#FillPattern.Forward.mask)" /></pattern>`,
+  'FillPattern.Backward': (
+    id: string,
+    fill: string
+  ) => `<pattern id="${id}" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse" >
+  <rect x="0" y="0" width="8" height="8" stroke="none" fill="${fill}" mask="url(#FillPattern.Backward.mask)" />
+  </pattern>`,
+  'FillPattern.CrossDiag': (
+    id: string,
+    fill: string
+  ) => `<pattern id="${id}" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse" >
+  <rect x="0" y="0" width="8" height="8" stroke="none" fill="${fill}" mask="url(#FillPattern.CrossDiag.mask)" />
+  </pattern>`
+};

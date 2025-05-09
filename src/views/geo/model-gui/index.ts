@@ -1,3 +1,4 @@
-export * from './component/component';
-export * from './component/edge';
-export * from './component/diagram';
+export * from './components/component';
+export * from './components/edge';
+export * from './components/graph';
+export * from './components/diagram';

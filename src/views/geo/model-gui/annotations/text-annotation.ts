@@ -1,38 +1,43 @@
 import type { Graph } from '@antv/x6';
-import type { Component } from '../component/component';
-import { Transform, Transformation } from '../component/transformation';
+import type { Component } from '../components/component';
+import { Transform } from '../components/transformation';
 import { ShapeType } from '../enums';
-import { getNormalizedAngle } from '../utils';
+import { getBigNumerIntance, getNormalizedAngle } from '../utils';
 import ShapeAnnotation from './shape-annotation';
-import type { DiagramShape } from '../model';
+import type { DiagramCell } from '@/views/simulation/model/components/graphics/type';
+
 export default class TextAnnotation extends ShapeAnnotation {
   public tag = ShapeType.Text;
-
-  public parent: Component;
-  constructor(graph: Graph, shape: DiagramShape, parent: Component) {
+  // 最小文本大小 8pt => 8 * (72 / 96)
+  private minimumFontSize = 6;
+  constructor(graph: Graph, shape: DiagramCell, parent?: Component) {
     super(graph, shape, parent);
-    this.parent = parent;
-    this.transformation = new Transformation(this, parent);
   }
 
+  /**
+   * @description:
+   * TODO 处理文本的剧中属性&& style 样式属性
+   * @return {*}
+   */
   public markup() {
-    const { color, originalTextString } = this.shape;
+    const { textColor, textString } = this;
     const [p1, p2] = this.getPathPoint();
     const { x, y, width, height } = this.getBox(p1, p2);
-    const fontColor = this.getRgbColor(color);
     const transform = this.transformation.getTransformationMatrix();
     const divHight = `${height}px`;
-    const text =
-      originalTextString === '%name'
-        ? this.parent.componentInfo.name
-        : originalTextString;
     const htmlTransform = this.getTextTransformScale(transform);
+    const fontObj = this.patchFontSize(
+      textString,
+      this.minimumFontSize,
+      width,
+      height
+    );
     return {
       tagName: 'foreignObject',
       attrs: {
         x,
         y,
-        width,
+        width: `${fontObj.boudingWidth}`,
         height,
         transform
       },
@@ -48,11 +53,11 @@ export default class TextAnnotation extends ShapeAnnotation {
             whiteSpace: 'nowrap',
             textOverflow: 'ellipsis',
             lineHeight: divHight,
-            color: `${fontColor}`,
-            fontSize: `12px`,
+            color: `${textColor}`,
+            fontSize: `${fontObj.fontSize}px`,
             transform: htmlTransform
           },
-          textContent: text
+          textContent: textString
         }
       ]
     };
@@ -80,12 +85,13 @@ export default class TextAnnotation extends ShapeAnnotation {
       // 参数配置 分别对应里面的 flipX flipY
       textDefaultTransform.scale(Number(scaleParam[1]), Number(scaleParam[2]));
     }
-    const pFlipX = this.parent.coOrdinateSystem.flipX;
-    const pFlipY = this.parent.coOrdinateSystem.flipY;
-    const componentAngle = getNormalizedAngle(this.parent.rotation);
+    const pFlipX = this.component?.coordinateSystem.flipX;
+    const pFlipY = this.component?.coordinateSystem.flipY;
+    const componentRotation = this.component?.componentInfo.rotation || 0;
+    const componentAngle = getNormalizedAngle(componentRotation);
     let shapeAngle = getNormalizedAngle(this.rotation);
     if (shapeAngle > 0) {
-      shapeAngle = getNormalizedAngle(this.parent.rotation + this.rotation);
+      shapeAngle = getNormalizedAngle(componentRotation + this.rotation);
       if (shapeAngle === 180) {
         textDefaultTransform.scale(-1, 1);
       }
@@ -113,5 +119,85 @@ export default class TextAnnotation extends ShapeAnnotation {
       }
     }
     return textDefaultTransform.toString();
+  }
+
+  public getBoundingRect(text: string, fontSize: number) {
+    const context = Measuretext.getContext();
+    context.font = `${fontSize}px sans-serif`;
+    // Measure the text
+    const textWidth = context.measureText(text).width;
+    const textHeight = fontSize;
+    // Return the bounding rectangle
+    const BigNumber = getBigNumerIntance();
+    return {
+      width: Math.ceil(textWidth),
+      // 高度扩充 0.2倍，适配一些字体展示不全
+      height: new BigNumber(textHeight).multipliedBy(1.2).toNumber()
+    };
+  }
+
+  /**
+   * @description: 根据缩放因子计算文本大小
+   * @return {*}
+   */
+  private patchFontSize(
+    text: string,
+    defaultFontSize: number,
+    absBoundingWidth: number,
+    absBoundingHeight: number
+  ): { fontSize: number; boudingWidth: number } {
+    const fontBoundFont = this.getBoundingRect(text, defaultFontSize);
+    const xFactor = absBoundingWidth / fontBoundFont.width;
+    const yFactor = absBoundingHeight / fontBoundFont.height;
+    const factor =
+      absBoundingWidth !== 0 && xFactor < yFactor ? xFactor : yFactor;
+    // 计算出实际fontsize
+    const fontSize = Math.floor(this.minimumFontSize * factor);
+    // 兼容 width 为0 的场景
+    if (absBoundingWidth === 0) {
+      absBoundingWidth = text.length * fontSize;
+    }
+    return {
+      fontSize,
+      boudingWidth: absBoundingWidth
+    };
+  }
+
+  private truncateText(text: string, maxWidth: number, font: number) {
+    const context = Measuretext.getContext();
+
+    // 设置绘图上下文的字体样式
+    context.font = `${font}`;
+    // 使用measureText方法测量文本的宽度
+    const textWidth = context.measureText(text).width;
+
+    // 如果文本宽度超过最大宽度，则进行截取
+    if (textWidth > maxWidth) {
+      const ellipsis = '...';
+      const ellipsisWidth = context.measureText(ellipsis).width;
+      const characters = text.split('');
+      let width = 0;
+      for (let i = 0; i < characters.length; i++) {
+        width += context.measureText(characters[i]).width;
+        if (width + ellipsisWidth > maxWidth) {
+          return characters.slice(0, i).join('') + ellipsis;
+        }
+      }
+    }
+
+    // 如果文本宽度未超过最大宽度，则返回原始文本
+    return text;
+  }
+}
+
+class Measuretext {
+  private static context: null | CanvasRenderingContext2D;
+  constructor() {}
+  public static getContext() {
+    if (!Measuretext.context) {
+      const canvas = document.createElement('canvas');
+      Measuretext.context = canvas.getContext('2d');
+    }
+    return Measuretext.context;
   }
 }

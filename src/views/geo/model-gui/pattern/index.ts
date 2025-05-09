@@ -1,4 +1,5 @@
-import { masks, parttens } from './defs-element';
+import { PatterMap, masks, parttens } from './defs-element';
+import type { Graph } from '@antv/x6';
 
 const ns = {
   svg: 'http://www.w3.org/2000/svg',
@@ -27,7 +28,7 @@ function parseXML(
   let xml;
   try {
     const parser = new DOMParser();
-    xml = parser.parseFromString(data, options.mimeType || 'text/xml');
+    xml = parser.parseFromString(data, options?.mimeType || 'text/xml');
   } catch {
     xml = undefined;
   }
@@ -72,4 +73,35 @@ export function initSvgPattern(): void {
     docFrag.appendChild(document.importNode(doc.firstChild, true));
   });
   defEl.appendChild(docFrag);
+}
+
+/**
+ * @description: 定义pattern
+ * @param {Graph} graph
+ * @param {string} patterType
+ * @param {string} id id ${类型}.${rgb(color)}
+ * @param {string} fill
+ * @return {*}
+ */
+export function definePattern(
+  graph: Graph,
+  patterType: string,
+  id: string,
+  fill: string
+): string {
+  const patternFactory = PatterMap[patterType];
+  if (!patternFactory) {
+    return id;
+  }
+  /* eslint-disable */
+  const el = graph.view.svg.getElementById(id);
+  if (el) {
+    return id;
+  }
+  const patternElString = patternFactory(id, fill);
+  const patternDoc = createSvgDocument(patternElString);
+  const docFragment = document.createDocumentFragment();
+  docFragment.appendChild(document.importNode(patternDoc.firstChild, true));
+  graph.view.defs.appendChild(docFragment);
+  return id;
 }

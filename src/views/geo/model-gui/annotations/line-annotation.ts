@@ -1,17 +1,16 @@
-import { Graph } from '@antv/x6';
-import { Transformation } from '../component/transformation';
-import { ShapeType } from '../enums';
-import { DiagramShape, PointArray } from '../model';
-import { toPoint } from '../utils';
+import type { Graph } from '@antv/x6';
+import { Arrow, ShapeType } from '../enums';
+import type { PointArray } from '../model';
 import ShapeAnnotation from './shape-annotation';
-import { Component } from '../component/component';
+import type { Component } from '../components/component';
+import type { DiagramCell } from '@/views/simulation/model/components/graphics/type';
 
 export default class LineAnnotation extends ShapeAnnotation {
   tag = ShapeType.Line;
-
-  constructor(graph: Graph, shape: DiagramShape, parent: Component) {
+  private isBezier = false;
+  constructor(graph: Graph, shape: DiagramCell, parent?: Component) {
     super(graph, shape, parent);
-    this.transformation = new Transformation(this, parent);
+    this.isBezier = this.rawShape.smooth?.name === 'Smooth.Bezier';
   }
 
   /**
@@ -21,7 +20,7 @@ export default class LineAnnotation extends ShapeAnnotation {
    */
   public formatNormalLine(linePoints: PointArray): string {
     const linePointLen = linePoints.length;
-    let pointPath = [];
+    const pointPath = [];
     for (let index = 0; index < linePointLen; index++) {
       const { x, y } = linePoints[index];
       if (index === 0) {
@@ -42,13 +41,15 @@ export default class LineAnnotation extends ShapeAnnotation {
     const linePointLen = linePoints.length;
     let linePath = '';
     for (let index = 0; index < linePointLen + 1; index++) {
-      if (index == 0) {
+      if (index === 0) {
         const { x, y } = linePoints[index];
         linePath += `M${x},${y} `;
       } else if (index === 1) {
         const { x: point0X, y: point0Y } = linePoints[0];
         const { x: point1X, y: point1Y } = linePoints[1];
-        linePath += `L${((point0X + point1X) / 2 + point0X) / 2},${((point0Y + point1Y) / 2 + point0Y) / 2}`;
+        linePath += `L${((point0X + point1X) / 2 + point0X) / 2},${
+          ((point0Y + point1Y) / 2 + point0Y) / 2
+        }`;
       } else if (index === linePointLen) {
         const { x, y } = linePoints[linePointLen - 1];
         linePath += `L${x},${y}`;
@@ -56,33 +57,35 @@ export default class LineAnnotation extends ShapeAnnotation {
         const { x: x1, y: y1 } = linePoints[index - 2];
         const { x: x2, y: y2 } = linePoints[index - 1];
         const { x: x3, y: y3 } = linePoints[index];
-        linePath += `C${(x1 + x2) / 2},${(y1 + y2) / 2} ${x2},${y2} ${(x2 + x3) / 2},${(y2 + y3) / 2}`;
+        linePath += `C${(x1 + x2) / 2},${(y1 + y2) / 2} ${x2},${y2} ${
+          (x2 + x3) / 2
+        },${(y2 + y3) / 2}`;
       }
     }
     return linePath;
   }
 
   public markup() {
-    const { linePattern, smooth } = this.shape;
+    const { strokeDasharray, stroke, strokeWidth } = this;
     const linePoints = this.getPathPoint();
-    const strokeWidth = this.lineThickness;
-    const strokeDasharray = linePattern !== 'LinePattern.Solid' ? 1 : 0;
-    const stroke = this.lineColor;
     const fill = 'none';
-    const isBezier = smooth == 'Smooth.Bezier';
+
     const transform = this.transformation.getTransformationMatrix();
-    const path = this.getLine(linePoints, isBezier);
+    const path = this.getLine(linePoints, this.isBezier);
+    const { markerStart, markerEnd } = this.getMarker();
     return {
       tagName: 'path',
       attrs: {
         d: path,
         fill,
         stroke,
-        strokeWidth: strokeWidth,
-        strokeDasharray: strokeDasharray,
+        strokeWidth,
+        strokeDasharray,
         transform,
-        magnet: this.magnet,
-      },
+        markerEnd,
+        markerStart,
+        magnet: this.magnet
+      }
     };
   }
 
@@ -92,7 +95,7 @@ export default class LineAnnotation extends ShapeAnnotation {
    * @param {boolean} isBezier
    * @return {*}
    */
-  public getLine(linePoints, isBezier: boolean) {
+  public getLine(linePoints: PointArray, isBezier: boolean) {
     const pointLen = linePoints.length;
     const path = [];
     if (pointLen > 0) {
@@ -110,14 +113,16 @@ export default class LineAnnotation extends ShapeAnnotation {
             const point1 = linePoints[i - 2];
             const point12 = {
               x: (point1.x + point2.x) / 2,
-              y: (point1.y + point2.y) / 2,
+              y: (point1.y + point2.y) / 2
             };
             const point23 = {
               x: (point2.x + point3.x) / 2,
-              y: (point2.y + point3.y) / 2,
+              y: (point2.y + point3.y) / 2
             };
-            path.push(`L${point12.x},${point12.y}`);
-            path.push(`C${point12.x},${point12.y} ${point2.x},${point2.y} ${point23.x},${point23.y}`);
+            path.push(
+              `L${point12.x},${point12.y}`,
+              `C${point12.x},${point12.y} ${point2.x},${point2.y} ${point23.x},${point23.y}`
+            );
             // if its the last point
             if (i === pointLen - 1) {
               path.push(`L${point3.x},${point3.y}`);
@@ -132,5 +137,36 @@ export default class LineAnnotation extends ShapeAnnotation {
       }
     }
     return path.join(' ');
+  }
+
+  public getMarker() {
+    const startOptions = {
+      d: 'M 20 -10 0 0 20 10 Z'
+    };
+    const endOptions = {
+      d: 'M -20 10 0 0 -20 -10 Z'
+    };
+    const MarkerOptions = {
+      fill: this.color || this.fill,
+      tagName: 'path'
+    };
+    const markerStart = this.getMarkerId(this.startArrow, {
+      ...MarkerOptions,
+      ...startOptions
+    });
+    const markerEnd = this.getMarkerId(this.endArrow, {
+      ...MarkerOptions,
+      ...endOptions
+    });
+    return {
+      markerStart,
+      markerEnd
+    };
+  }
+
+  public getMarkerId(key: string, options: any): string {
+    return key !== Arrow.None
+      ? `url(#${this.graph.defineMarker(options)})`
+      : 'url(#none)';
   }
 }
